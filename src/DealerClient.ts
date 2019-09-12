@@ -9,6 +9,7 @@ import {
 } from "0x.js";
 import { MetamaskSubprovider } from "@0x/subproviders";
 import { Web3Wrapper } from "@0x/web3-wrapper";
+import assert from "assert";
 import axios from "axios";
 import { TransactionReceiptWithDecodedLogs } from "ethereum-types";
 import Web3 from "web3";
@@ -172,22 +173,10 @@ export class DealerClient {
    * ```
    */
   public async getQuote(size: number, symbol: string, side: string): Promise<DealerResponse> {
-    if (!this.initialized) {
-      throw new Error("not initialized (call .init() first)");
-    }
-
-    if (side !== "bid" && side !== "ask") {
-      throw new Error("side must be 'bid' or 'ask'");
-    }
-
-    if (this.pairs.indexOf(symbol) === -1) {
-      throw new Error("unsupported token pair (see .pairs)");
-    }
-
-    const sizeBn = new BigNumber(size);
-    if (sizeBn.isNaN()) {
-      throw new Error("invalid size input (non-numeric string or not number)");
-    }
+    assert(this.initialized, "not initialized (call .init() first)");
+    assert(side === "bid" || side === "ask", 'side must be "bid" or "ask"');
+    assert(this.pairs.includes(symbol), "unsupported token pair (see .pairs)");
+    assert(typeof size === "number", "size must be a number");
 
     const response = await this._call("quote", "GET", { size, symbol, side });
     return response;
@@ -226,24 +215,14 @@ export class DealerClient {
     clientAsset: string,
     dealerAsset: string,
   ): Promise<DealerResponse> {
-    if (!this.initialized) {
-      throw new Error("not initialized (call .init() first)");
-    }
-
+    assert(this.initialized, "not initialized (call .init() first)");
+    assert(typeof size === "number", "size must be a number");
     const dealerBase = `${dealerAsset}/${clientAsset}`;
     const clientBase = `${clientAsset}/${dealerAsset}`;
-
-    if (
-      this.pairs.indexOf(dealerBase) === -1 &&
-      this.pairs.indexOf(clientBase) === -1
-    ) {
-      throw new Error("unable to fetch swap quote for provided assets");
-    }
-
-    const sizeBn = new BigNumber(size);
-    if (sizeBn.isNaN()) {
-      throw new Error("invalid size input (non-numeric string or not number)");
-    }
+    assert(
+      this.pairs.includes(dealerBase) || this.pairs.includes(clientBase),
+      "configured dealer unable to server requested market",
+    );
 
     const response = await this._call("swap", "GET", { size, dealerAsset, clientAsset });
     return response;
@@ -309,8 +288,7 @@ export class DealerClient {
     };
 
     try {
-      const response = await this._call("order", "POST", req);
-      const { txId } = response;
+      const { txId } = await this._call("order", "POST", req);
       return txId;
     } catch (error) {
       throw new Error(`failed to submit trade: ${error.message}`);
@@ -421,16 +399,14 @@ export class DealerClient {
    * @returns Resolves when mined successfully, rejects if the TX failed.
    */
   public async waitForTransactionSuccessOrThrow(txId: string): Promise<void> {
-    if (!/^0x[a-fA-F0-9]{64}$/.test(txId)) {
-      throw new Error("invalid transaction ID");
-    }
+    assert(/^0x[a-fA-F0-9]{64}$/.test(txId), "invalid transaction ID");
     await this.web3Wrapper.awaitTransactionSuccessAsync(txId);
   }
 
   /**
    * Turn a `string` or primitive `number` into a `BigNumber` for math reasons.
    *
-   * @param number the primitive number value to convert.
+   * @param n the primitive number value to convert.
    * @returns The number as a `BigNumber` instance.
    *
    * @example
@@ -439,13 +415,9 @@ export class DealerClient {
    * bigNum = client.makeBigNumber(10)       // works with strings or numbers
    * ```
    */
-  public makeBigNumber(_number: number | string): BigNumber {
-    if (typeof _number === "string" && !/^\d*$/.test(_number)) {
-      throw new Error("invalid number string input");
-    } else if (typeof _number !== "number" && typeof _number !== "string") {
-      throw new Error("must provide number or string number");
-    }
-    return new BigNumber(_number);
+  public makeBigNumber(n: number | string): BigNumber {
+    assert(typeof n === "number" || typeof n !== "string", "n must be a number or string number");
+    return new BigNumber(n);
   }
 
   /**
@@ -465,9 +437,7 @@ export class DealerClient {
    * ```
    */
   public fromWei(weiAmount: string): string {
-    if (typeof weiAmount !== "string") {
-      throw new Error("pass amounts as strings to avoid precision errors");
-    }
+    assert(typeof weiAmount === "string", "pass amounts as strings to avoid precision errors");
     return this.web3.utils.fromWei(weiAmount);
   }
 
@@ -488,9 +458,7 @@ export class DealerClient {
    * ```
    */
   public toWei(etherAmount: string): string {
-    if (typeof etherAmount !== "string") {
-      throw new Error("pass amounts as strings to avoid precision errors");
-    }
+    assert(typeof etherAmount === "string", "pass amounts as strings to avoid precision errors");
     return this.web3.utils.toWei(etherAmount);
   }
 
@@ -503,30 +471,16 @@ export class DealerClient {
    * @returns A string that can be used as a hyperlink to etherscan.
    */
   public getEtherscanLink(txId: string): string {
-    if (!/^0x[a-fA-F0-9]{64}$/.test(txId)) {
-      throw new Error("invalid transaction ID");
-    }
+    assert(/^0x[a-fA-F0-9]{64}$/.test(txId), "invalid transaction ID");
 
-    let prefix;
+    const prefix = p => `https://${p}.etherscan.io/tx/${txId}`;
     switch (this.networkId) {
-      case 1:
-        prefix = "www";
-        break;
-      case 3:
-        prefix = "ropsten";
-        break;
-      case 4:
-        prefix = "rinkeby";
-        break;
-      case 42:
-        prefix = "kovan";
-        break;
-      default: {
-        throw new Error("etherscan unsupported on current network");
-      }
+      case 1: return prefix("www");
+      case 3: return prefix("ropsten");
+      case 4: return prefix("rinkeby");
+      case 42: return prefix("kovan");
+      default: throw new Error("etherscan unsupported on current network");
     }
-
-    return `https://${prefix}.etherscan.io/tx/${txId}`;
   }
 
   /**
@@ -544,19 +498,21 @@ export class DealerClient {
   }
 
   private async _connectMetamask(): Promise<void> {
-    if ((window as any).ethereum !== void 0) {
+    assert(window, "not in browser environment");
+    const { web3, ethereum } = (window as any);
+    assert(web3 || ethereum, "unsupported browser (must be a web3 browser)");
+
+    if (ethereum) {
       try {
-        await (window as any).ethereum.enable();
-        this.web3 = new Web3((window as any).ethereum);
+        await ethereum.enable();
+        this.web3 = new Web3(ethereum);
       } catch (error) {
         throw new Error("user denied site access");
       }
-      (global as any).web3 = this.web3;
-    } else if ((window as any).web3 !== void 0) {
-      this.web3 = new Web3((window as any).web3.currentProvider);
-      (global as any).web3 = this.web3;
+      Object.defineProperty(global, "web3", this.web3);
     } else {
-      throw new Error("non-ethereum browser detected");
+      this.web3 = new Web3(web3.currentProvider);
+      Object.defineProperty(window, "web3", this.web3);
     }
   }
 
@@ -577,9 +533,7 @@ export class DealerClient {
 
   private _getAddress(ticker: string): string {
     const tokenAddress = this.tokens[ticker];
-    if (!tokenAddress) {
-      throw new Error("unsupported token ticker");
-    }
+    assert(tokenAddress, "unsupported token ticker");
     return tokenAddress;
   }
 
