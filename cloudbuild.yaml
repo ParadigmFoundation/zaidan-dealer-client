@@ -1,0 +1,11 @@
+steps:
+  - name: gcr.io/kosu-io/node-ci:latest
+    entrypoint: yarn
+    args: ["install"]
+  
+  - name: gcr.io/kosu-io/node-ci:latest
+    entrypoint: yarn
+    args: ["docs:build"]
+
+  - name: gcr.io/cloud-builders/gsutil
+    args: ["-m", "rsync", "-r", "-c", "-d", "./docs/.vuepress/dist", "gs://docs.zaidan.io"]
