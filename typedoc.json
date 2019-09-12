@@ -1,0 +1,10 @@
+{
+    "name": "Zaidan dealer client",
+    "mode": "file",
+    "readme": "./README.md",
+    "theme": "markdown",
+    "out": "./docs",
+    "excludeExternals": true,
+    "ignoreCompilerErrors": true,
+    "includeDeclarations": true
+}

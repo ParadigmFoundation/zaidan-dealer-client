@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "outDir": "dist",
+        "rootDir": "src",
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "removeComments": true,
+        "typeRoots": [
+            "../node_modules/@types",
+            "../node_modules/@0x/typescript-typings/types"
+        ]
+    },
+    "include": [
+        "src/index.ts",
+        "src/tokens.json"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
