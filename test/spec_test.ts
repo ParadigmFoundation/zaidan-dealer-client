@@ -16,12 +16,15 @@ const {
   DEALER_PORT = "8080",
   DEALER_URL = "http://localhost:8080",
 
-  // defaults are 0x snapshot dummy ERC-20 tokens
+  // defaults are 0x snapshot dummy ERC-20 tokens (format "TICKER:ADDRESS")
   DUMMY_TOKEN_A = "TKA:0x34d402f14d58e001d8efbe6585051bf9706aa064",
   DUMMY_TOKEN_B = "TKB:0x25b8fe1de9daf8ba351890744ff28cf7dfa8f5e3",
 
   DEALER_ACCOUNT_INDEX = "4",
   CLIENT_ACCOUNT_INDEX = "5",
+
+  // configures number of tokens to mint of both token A and B for client/dealer
+  MINT_AMOUNT = "1000",
 } = process.env;
 
 describe("Zaidan client unit tests", function (): void {
@@ -31,7 +34,7 @@ describe("Zaidan client unit tests", function (): void {
   const MAX_ALLOWANCE = new BigNumber(2).exponentiatedBy(256).minus(1);
 
   // mint amount used for dummy tokens
-  const MINT_AMOUNT = new BigNumber(Web3.utils.toWei("1000"));
+  const mintAmount = new BigNumber(Web3.utils.toWei(MINT_AMOUNT));
 
   // zaidan dealer client instance
   let client: DealerClient;
@@ -58,7 +61,7 @@ describe("Zaidan client unit tests", function (): void {
   let server: Server;
 
   this.beforeAll("start mock dealer server", function (): void {
-    server = app.listen(parseInt(DEALER_PORT), () => console.log("mock dealer started"));
+    server = app.listen(parseInt(DEALER_PORT));
   });
 
   this.afterAll("stopping mock server", function (): void {
@@ -95,12 +98,12 @@ describe("Zaidan client unit tests", function (): void {
     await tokenA.approve.awaitTransactionSuccessAsync(erc20ProxyAddress, MAX_ALLOWANCE, { from: dealerAddress });
   });
 
-  this.beforeAll("mint 1000 of each token for dealer and client", async function (): Promise<void> {
-    await tokenA.mint.sendTransactionAsync(MINT_AMOUNT, { from: dealerAddress });
-    await tokenB.mint.sendTransactionAsync(MINT_AMOUNT, { from: dealerAddress });
+  this.beforeAll("mint same number of each token for dealer and client", async function (): Promise<void> {
+    await tokenA.mint.sendTransactionAsync(mintAmount, { from: dealerAddress });
+    await tokenB.mint.sendTransactionAsync(mintAmount, { from: dealerAddress });
 
-    await tokenA.mint.sendTransactionAsync(MINT_AMOUNT, { from: clientAddress });
-    await tokenB.mint.sendTransactionAsync(MINT_AMOUNT, { from: clientAddress });
+    await tokenA.mint.sendTransactionAsync(mintAmount, { from: clientAddress });
+    await tokenB.mint.sendTransactionAsync(mintAmount, { from: clientAddress });
   });
 
   it("should show assets that match expected addresses", function (done: MochaDone): void {
