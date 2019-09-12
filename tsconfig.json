@@ -10,8 +10,8 @@
         "resolveJsonModule": true,
         "removeComments": true,
         "typeRoots": [
-            "../node_modules/@types",
-            "../node_modules/@0x/typescript-typings/types"
+            "node_modules/@types",
+            "node_modules/@0x/typescript-typings/types"
         ]
     },
     "include": [

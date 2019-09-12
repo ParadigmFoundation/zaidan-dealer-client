@@ -3,13 +3,14 @@
         "tslint:latest"
     ],
     "rules": {
+        "only-arrow-functions": false,
         "adjacent-overload-signatures": true,
         "arrow-parens": [
             true,
             "ban-single-arg-parens"
         ],
         "arrow-return-shorthand": true,
-        "await-promise": true,
+        "await-promise": false,
         "binary-expression-operand-order": true,
         "callable-types": true,
         "class-name": true,
@@ -74,7 +75,7 @@
         ],
         "no-inferred-empty-object-type": true,
         "no-invalid-template-strings": true,
-        "no-invalid-this": true,
+        "no-invalid-this": false,
         "no-misused-new": true,
         "no-non-null-assertion": true,
         "no-parameter-reassignment": true,
@@ -119,7 +120,7 @@
             "always"
         ],
         "space-before-function-paren": [
-            true,
+            false,
             {
                 "anonymous": "never",
                 "asyncArrow": "always",
