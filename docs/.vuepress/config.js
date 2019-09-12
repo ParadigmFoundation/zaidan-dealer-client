@@ -37,9 +37,9 @@ module.exports = {
                 collapsable: true,
                 food: "1.svg",
                 children: [
-                    "/typedoc",
-                    "/typedoc/classes/dealerclient",
-                    "/typedoc/interfaces/dealerresponse",
+                    "typedoc/",
+                    "typedoc/classes/dealerclient",
+                    "typedoc/interfaces/dealerresponse",
                 ]
             },
         ]
