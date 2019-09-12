@@ -10,9 +10,9 @@ View [the documentation for full API reference.](./docs/classes/dealerclient.md)
 
 ## Usage
 
-The `DealerClient` can be used in supported Web3 browsers (depends on a `window.ethereum` provider) or in server environments with an unlocked node, by passing an Ethereum JSONRPC URI as the second parameter to the constructor.
+The `DealerClient` supports Web3 browsers that expose a `window.ethereum` provider, and can also be used in server environments by passing an Ethereum JSONRPC URL as the second parameter to the constructor.
 
-Eventually, other signing providers may be supported, such as hardware wallets or a mnemonic.
+In the future, it will support additional provider types, such as hardware wallets and mnemonics.
 
 ### Import into project
 TypeScript/ES6:
@@ -32,9 +32,21 @@ const { DealerClient } = window.Zaidan;
 
 ### Initialize
 Pass the `DealerClient` constructor a full URL to a Zaidan dealer RPC server.
+
+## Client-side (browser)
 ```typescript
 (async () => {
   const dealer = new DealerClient("https://dealer.zaidan.io/");
+
+  // must be initialized before use, will prompt user to connect wallet
+  await dealer.init();
+})();
+```
+
+## Server-side (unlocked node)
+```typescript
+(async () => {
+  const dealer = new DealerClient("https://dealer.zaidan.io/", "http://localhost:8545");
 
   // must be initialized before use, will prompt user to connect wallet
   await dealer.init();

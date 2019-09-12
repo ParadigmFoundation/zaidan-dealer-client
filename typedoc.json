@@ -3,7 +3,7 @@
     "mode": "file",
     "readme": "./README.md",
     "theme": "markdown",
-    "out": "./docs",
+    "out": "./docs/typedoc",
     "excludeExternals": true,
     "ignoreCompilerErrors": true,
     "includeDeclarations": true

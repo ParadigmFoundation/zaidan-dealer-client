@@ -15,9 +15,11 @@
     "lint:fix": "tslint -p . --fix",
     "start:snapshot": "docker run -d --rm -p 8545:8545 --name zrx ${npm_package_config_image}",
     "stop:snapshot": "docker kill zrx",
-    "docs": "typedoc ./src",
     "dev": "webpack-dev-server",
-    "prepublishOnly": "webpack"
+    "prepublishOnly": "webpack",
+    "docs": "typedoc ./src",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "yarn docs && vuepress build docs"
   },
   "config": {
     "image": "gcr.io/zaidan-eth-net/0x-snapshot:0.2.1"
@@ -27,6 +29,7 @@
     "@0x/subproviders": "^5.0.3",
     "@0x/web3-wrapper": "^6.0.12",
     "axios": "^0.19.0",
+    "dotenv": "^6.2.0",
     "web3": "1.2.0"
   },
   "devDependencies": {
@@ -34,6 +37,7 @@
     "@0x/typescript-typings": "^4.2.4",
     "@types/mocha": "^5.2.7",
     "@types/web3": "^1.0.19",
+    "@vuepress/plugin-google-analytics": "^1.0.0-alpha.0",
     "body-parser": "^1.19.0",
     "ethereum-types": "^2.1.4",
     "express": "^4.17.1",
@@ -48,7 +52,9 @@
     "uuid": "^3.3.3",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
-    "webpack-dev-server": "^3.4.1"
+    "webpack-dev-server": "^3.4.1",
+    "webpack-dev-middleware": "^3.6.0",
+    "vuepress": "^0.14.8"
   },
   "files": [
     "dist/index.js",
