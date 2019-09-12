@@ -10,7 +10,9 @@ View [the documentation for full API reference.](./docs/classes/dealerclient.md)
 
 ## Usage
 
-Currently, the `DealerClient` can only be used in the browser (depends on `window.ethereum`).
+The `DealerClient` can be used in supported Web3 browsers (depends on a `window.ethereum` provider) or in server environments with an unlocked node, by passing an Ethereum JSONRPC URI as the second parameter to the constructor.
+
+Eventually, other signing providers may be supported, such as hardware wallets or a mnemonic.
 
 ### Import into project
 TypeScript/ES6:
