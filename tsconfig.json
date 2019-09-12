@@ -15,7 +15,7 @@
         ]
     },
     "include": [
-        "src/index.ts",
+        "src/DealerClient.ts",
         "src/tokens.json"
     ],
     "exclude": [
