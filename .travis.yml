@@ -5,11 +5,6 @@ node_js:
 services:
   - docker
 before_install:
-  # ensure usage of Node.js LTS
-  - nvm install 10
-  - nvm use 10
-  - node --version
-
   # start ganache snapshot
   - docker run -d --rm -p 8545:8545 gcr.io/zaidan-eth-net/0x-snapshot:latest
 install:
