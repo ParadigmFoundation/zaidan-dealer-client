@@ -1,7 +1,6 @@
 import {
   BigNumber,
   ContractWrappers,
-  ERC20TokenContract,
   generatePseudoRandomSalt,
   signatureUtils,
   SignedOrder,
@@ -14,7 +13,7 @@ import axios from "axios";
 import { TransactionReceiptWithDecodedLogs } from "ethereum-types";
 import Web3 from "web3";
 
-import { DealerResponse } from "./types";
+import { DealerResponse, ERC20Token } from ".";
 
 /**
  * A simple client for the Zaidan dealer server.
@@ -31,6 +30,9 @@ export class DealerClient {
 
   /** Base API path for the dealer server. */
   private readonly apiBase: string;
+
+  /** ERC-20 token abstraction. */
+  private erc20Token: ERC20Token;
 
   /**
    * An array of the currently supported pairs (as expected by `getQuote`).
@@ -137,6 +139,7 @@ export class DealerClient {
       );
     }
 
+    this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
     this.coinbase = await this.web3.eth.getCoinbase();
     this.pairs = await this._loadMarkets();
     this.tokens = await this._loadAssets();
@@ -316,12 +319,7 @@ export class DealerClient {
    */
   public async hasAllowance(tokenTicker: string): Promise<boolean> {
     const tokenAddress = this._getAddress(tokenTicker);
-    const proxyAddress = this.contractWrappers.erc20Proxy.address;
-    const token = new ERC20TokenContract(tokenAddress, this.web3.currentProvider);
-    const allowance = await token.allowance.callAsync(
-      this.coinbase,
-      proxyAddress,
-    );
+    const allowance = await this.erc20Token.getProxyAllowanceAsync(tokenAddress, this.coinbase);
 
     // (2**256 - 1)/2 represents a remaining wei allowance for which a greater remaining
     // amount indicates the user set an "unlimited" allowance at one point
@@ -355,13 +353,7 @@ export class DealerClient {
    */
   public async setAllowance(tokenTicker: string): Promise<TransactionReceiptWithDecodedLogs> {
     const tokenAddress = this._getAddress(tokenTicker);
-    const token = new ERC20TokenContract(tokenAddress, this.web3.currentProvider, {
-      from: this.coinbase,
-      gasPrice: this.GAS_PRICE,
-    });
-
-    const proxyAddress = this.contractWrappers.erc20Proxy.address;
-    const txId = await token.approve.validateAndSendTransactionAsync(proxyAddress, DealerClient.MAX_ALLOWANCE);
+    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(tokenAddress, { from: this.coinbase });
     return this.web3Wrapper.awaitTransactionSuccessAsync(txId);
   }
 
@@ -383,12 +375,7 @@ export class DealerClient {
    */
   public async getBalance(tokenTicker: string): Promise<string> {
     const tokenAddress = this._getAddress(tokenTicker);
-    const token = new ERC20TokenContract(tokenAddress, this.web3.currentProvider, {
-      from: this.coinbase,
-      gasPrice: this.GAS_PRICE,
-    });
-
-    const balance = await token.balanceOf.callAsync(this.coinbase);
+    const balance = await this.erc20Token.getBalanceAsync(tokenAddress, this.coinbase);
     return balance.toString();
   }
 
