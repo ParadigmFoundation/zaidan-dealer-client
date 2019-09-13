@@ -1,6 +1,6 @@
 {
   "name": "zaidan-dealer-client",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/index.js",
   "repository": "https://github.com/ParadigmFoundation/zaidan-dealer-client",
   "license": "MIT",
@@ -62,6 +62,10 @@
     "dist/index.js.map",
     "dist/types.js",
     "dist/types.js.map",
+    "dist/DealerClient.js",
+    "dist/DealerClient.js.map",
+    "dist/ERC20Token.js",
+    "dist/ERC20Token.js.map",
     "dist/main.js",
     "webpack.config.js"
   ],
