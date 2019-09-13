@@ -11,7 +11,7 @@ import express from "express";
 import uuid from "uuid/v4";
 import Web3 from "web3";
 
-import { DealerResponse } from "../src/types";
+import { DealerResponse } from "../../src/types";
 
 const {
     WEB3_URL = "http://localhost:8545",

@@ -7,7 +7,7 @@ import Web3 from "web3";
 import { DealerClient } from "../src/DealerClient";
 
 // start mocking server
-import { app } from "./mockDealer";
+import { app } from "./helpers/mockDealer";
 
 const {
     WEB3_URL = "http://localhost:8545",
