@@ -74,10 +74,28 @@ export class ERC20Token {
      * @param userAddress User's address to fetch 0x ERC-20 proxy allowance for.
      */
     public async getProxyAllowanceAsync(tokenAddress: string, userAddress: string): Promise<BigNumber> {
-        await this._initializing;
-        const user = this.normalizeAddress(userAddress);
+        const proxyAddress = await this.getProxyAddressAsync();
+        return this.getAllowanceAsync(tokenAddress, userAddress, proxyAddress);
+    }
+
+    /**
+     * Set user's 0x ERC-20 allowance for a given address in base units (wei).
+     *
+     * @param tokenAddress The ERC-20 token contract address.
+     * @param spenderAddress The address of the desired spender to set allowance for.
+     * @param allowance The desired allowance (in wei) to set for the ERC-20 proxy.
+     * @param txOptions Optional transaction options (gas price, etc).
+     * @returns The resulting transaction hash.
+     */
+    public async setAllowanceAsync(
+        tokenAddress: string,
+        spenderAddress: string,
+        allowance: BigNumber,
+        txOptions: Partial<TxData> = {},
+    ): Promise<string> {
         const token = this.getTokenContract(tokenAddress);
-        return token.allowance.callAsync(user, this._erc20ProxyAddress);
+        const spender = this.normalizeAddress(spenderAddress);
+        return token.approve.validateAndSendTransactionAsync(spender, allowance, txOptions);
     }
 
     /**
@@ -91,11 +109,15 @@ export class ERC20Token {
     public async setProxyAllowanceAsync(
         tokenAddress: string,
         allowance: BigNumber,
-        txOptions?: TxData,
+        txOptions: Partial<TxData> = {},
     ): Promise<string> {
-        await this._initializing;
-        const token = this.getTokenContract(tokenAddress);
-        return token.approve.validateAndSendTransactionAsync(this._erc20ProxyAddress, allowance, txOptions);
+        const proxyAddress = await this.getProxyAddressAsync();
+        return this.setAllowanceAsync(
+            tokenAddress,
+            proxyAddress,
+            allowance,
+            txOptions,
+        );
     }
 
     /**
@@ -106,11 +128,12 @@ export class ERC20Token {
      * @param txOptions Optional transaction options (gas price, etc).
      * @returns The resulting transaction hash.
      */
-    public async setUnlimitedProxyAllowanceAsync(tokenAddress: string, txOptions?: TxData): Promise<string> {
-        await this._initializing;
-        const token = this.getTokenContract(tokenAddress);
-        return token.approve.validateAndSendTransactionAsync(
-            this._erc20ProxyAddress,
+    public async setUnlimitedProxyAllowanceAsync(
+        tokenAddress: string,
+        txOptions: Partial<TxData> = {},
+    ): Promise<string> {
+        return this.setProxyAllowanceAsync(
+            tokenAddress,
             ERC20Token.UNLIMITED_ALLOWANCE,
             txOptions,
         );
@@ -127,7 +150,7 @@ export class ERC20Token {
     /**
      * Fetch the 0x ERC-20 asset proxy address for the current network.
      */
-    public async getERC20ProxyAddressAsync(): Promise<string> {
+    public async getProxyAddressAsync(): Promise<string> {
         await this._initializing;
         return this._erc20ProxyAddress;
     }
@@ -154,17 +177,16 @@ export class ERC20Token {
         if (contract) {
             assert.strictEqual(address, contract.address, "ERC20Token: address mismatch");
             return contract;
-        } else {
-            contract = new ERC20TokenContract(address, this._provider);
-            this._tokenContracts[address] = contract;
         }
+        contract = new ERC20TokenContract(address, this._provider);
+        this._tokenContracts[address] = contract;
         return contract;
     }
 
     /**
      * Validate address (checksummed or not) and return un-checksummed lowercase.
      *
-     * @param address Token's contract address.
+     * @param address A 20-byteaddress.
      */
     private normalizeAddress(address: string): string {
         assert(/^0x[a-fA-F0-9]{40}$/.test(address), "ERC20Token: invalid Ethereum address");

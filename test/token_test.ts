@@ -68,7 +68,7 @@ describe("ERC20Token helper class tests", function (): void {
     });
 
     it("should have the correct erc20 proxy address", async function (): Promise<void> {
-        const loadedAddress = await erc20.getERC20ProxyAddressAsync();
+        const loadedAddress = await erc20.getProxyAddressAsync();
         assert.strictEqual(loadedAddress, erc20ProxyAddress, "asset proxy addresses should match");
     });
 
