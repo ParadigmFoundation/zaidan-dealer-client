@@ -129,8 +129,8 @@ describe("Zaidan client unit tests", function (): void {
         const balanceA = await client.getBalance(tokenATicker);
         const balanceB = await client.getBalance(tokenBTicker);
 
-        assert.strictEqual(balanceA.toString(), MINT_AMOUNT.toString(), "balance A should match mint amount");
-        assert.strictEqual(balanceB.toString(), MINT_AMOUNT.toString(), "balance B should match mint amount");
+        assert.strictEqual(balanceA.toString(), mintAmount.toString(), "balance A should match mint amount");
+        assert.strictEqual(balanceB.toString(), mintAmount.toString(), "balance B should match mint amount");
     });
 
     it("should show that proxy allowances are not set", async function (): Promise<void> {
