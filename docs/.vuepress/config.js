@@ -39,6 +39,7 @@ module.exports = {
                 children: [
                     "/",
                     "classes/dealerclient",
+                    "classes/erc20token",
                     "interfaces/dealerresponse",
                 ]
             },

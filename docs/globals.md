@@ -8,6 +8,7 @@
 ### Classes
 
 * [DealerClient](classes/dealerclient.md)
+* [ERC20Token](classes/erc20token.md)
 
 ### Interfaces
 
