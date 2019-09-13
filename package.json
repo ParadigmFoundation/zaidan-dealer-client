@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc",
     "test": "yarn start:snapshot && sleep 2 && yarn test:ci && yarn stop:snapshot",
-    "test:ci": "ts-mocha --exit test/spec_test.ts",
+    "test:ci": "ts-mocha --exit test/*_test.ts",
     "clean": "rm -rf node_modules dist",
     "compile:assets": "yarn build && webpack",
     "lint": "tslint -p .",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "0x.js": "^7.0.1",
+    "@0x/contract-addresses": "^3.1.0",
     "@0x/subproviders": "^5.0.3",
     "@0x/web3-wrapper": "^6.0.12",
     "axios": "^0.19.0",
