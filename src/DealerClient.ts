@@ -147,17 +147,17 @@ export class DealerClient {
   }
 
   /**
-   * Request orders from the Dealer server to sign. The response object
-   * contains a bid and ask order, both signed by the dealer server as the
-   * maker.
+   * Request a price quote a signed order from the dealer server. The response
+   * includes price and fee information, as well as signed 0x order message for
+   * the quote
    *
-   * One of these outputted orders can be passed to `client.handleTrade()`
-   * which will prompt the user to sign the order, and send it back to the
-   * server so it may be executed.
+   * The order in the quote can be passed to `client.handleTrade()` which will
+   * request a signature from the client according to ZEIP-18, and will prepare
+   * a fill transaction for the dealer to fill.
    *
-   * @param size the amount of tokens the user is selling
+   * @param size the amount of tokens the user is selling/buying (in units of base asset)
    * @param symbol the token pair the swap is for (ex: "WETH/DAI")
-   * @param side either 'bid' or 'ask' depending on side
+   * @param side either 'bid' or 'ask' depending on desired quote side
    * @returns a price quote and signed maker order from the dealer server
    *
    * @example
