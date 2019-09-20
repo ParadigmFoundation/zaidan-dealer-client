@@ -57,7 +57,7 @@ export default {
 
   &.open, &:hover {
     // color: inherit;
-    color: #445DF0;
+    color: #000000;
     font-weight: bold;
   }
 
