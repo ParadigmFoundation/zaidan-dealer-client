@@ -58,15 +58,9 @@
     "webpack-dev-server": "^3.4.1"
   },
   "files": [
-    "dist/index.js",
-    "dist/index.js.map",
-    "dist/types.js",
-    "dist/types.js.map",
-    "dist/DealerClient.js",
-    "dist/DealerClient.js.map",
-    "dist/ERC20Token.js",
-    "dist/ERC20Token.js.map",
-    "dist/main.js",
+    "dist/*.js",
+    "dist/*.js.map",
+    "dist/*.d.ts",
     "webpack.config.js"
   ],
   "publishConfig": {
