@@ -9,6 +9,7 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "removeComments": true,
+        "declaration": true,
         "typeRoots": [
             "node_modules/@types",
             "node_modules/@0x/typescript-typings/types"
