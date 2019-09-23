@@ -28,9 +28,7 @@ The parsed output of a GET /quote request.
 
 • **expiration**: *number*
 
-
-*Defined in [types.ts:10](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/types.ts#L10)*
-
+*Defined in [types.ts:10](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e458263/src/types.ts#L10)*
 
 The UNIX timestamp at which this offer expires.
 
@@ -40,9 +38,7 @@ ___
 
 • **fee**: *number*
 
-
-*Defined in [types.ts:22](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/types.ts#L22)*
-
+*Defined in [types.ts:22](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e458263/src/types.ts#L22)*
 
 The required fee from the dealer server.
 
@@ -52,9 +48,7 @@ ___
 
 • **id**: *string*
 
-
-*Defined in [types.ts:13](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/types.ts#L13)*
-
+*Defined in [types.ts:13](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e458263/src/types.ts#L13)*
 
 The unique request ID that refers to this offer.
 
@@ -64,9 +58,7 @@ ___
 
 • **order**: *SignedOrder*
 
-
-*Defined in [types.ts:25](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/types.ts#L25)*
-
+*Defined in [types.ts:25](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e458263/src/types.ts#L25)*
 
 The signed maker order from the dealer server.
 
@@ -76,9 +68,7 @@ ___
 
 • **price**: *number*
 
-
-*Defined in [types.ts:16](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/types.ts#L16)*
-
+*Defined in [types.ts:16](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e458263/src/types.ts#L16)*
 
 The price and order data for the quote.
 
@@ -88,8 +78,6 @@ ___
 
 • **size**: *number*
 
-
-*Defined in [types.ts:19](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/types.ts#L19)*
-
+*Defined in [types.ts:19](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e458263/src/types.ts#L19)*
 
 The taker size, specified in the initial request.
