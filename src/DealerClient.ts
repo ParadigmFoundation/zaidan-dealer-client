@@ -366,7 +366,9 @@ export class DealerClient {
       tokenAddress,
       {
         from: this.coinbase,
-        gasPrice: this.GAS_PRICE,
+
+        // convert to wei
+        gasPrice: this.GAS_PRICE.multipliedBy("1e9"),
       },
     );
     return this.web3Wrapper.awaitTransactionSuccessAsync(txId);
