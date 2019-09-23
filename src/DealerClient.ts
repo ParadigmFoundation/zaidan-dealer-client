@@ -547,10 +547,15 @@ export class DealerClient {
     return this._call("markets", "GET");
   }
 
+  // attempts to get from etherchain, on failure returns 12
   private async _getGasPrice(priority: GasPriority): Promise<BigNumber> {
     const gasPriceApi = "https://www.etherchain.org/api/gasPriceOracle";
-    const prices = await this._callAny(gasPriceApi, "GET");
-    return new BigNumber(prices[priority]);
+    try {
+      const prices = await axios(gasPriceApi);
+      return new BigNumber(prices.data[priority]);
+    } catch {
+      return new BigNumber(12);
+    }
   }
 
   private async _loadAssets(): Promise<any> {
