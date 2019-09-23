@@ -24,3 +24,8 @@ export interface DealerResponse {
     /** The signed maker order from the dealer server. */
     order: SignedOrder;
 }
+
+/**
+ * Gas price priority (as used in ETH Gas Station API).
+ */
+export type GasPriority = "safeLow" | "standard" | "fast";

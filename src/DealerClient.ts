@@ -14,6 +14,7 @@ import { TransactionReceiptWithDecodedLogs } from "ethereum-types";
 import Web3 from "web3";
 
 import { DealerResponse, ERC20Token } from ".";
+import { GasPriority } from "./types";
 
 /**
  * A simple client for the Zaidan dealer server.
@@ -72,6 +73,12 @@ export class DealerClient {
   public GAS_PRICE: BigNumber;
 
   /**
+   * Transaction priority (according to ethgasstation.info API), defaults to
+   * fast.
+   */
+  public txPriority: GasPriority;
+
+  /**
    * Instantiate a new DealerClient. Prior to use, `client.init()` should
    * be called, which triggers a prompt for the user to allow MetaMask to
    * connect to the site.
@@ -82,9 +89,9 @@ export class DealerClient {
    *
    * @param dealerUri the base RPC API path for the dealer server
    * @param web3Uri optional Ethereum JSONRPC url for server-side usage
-   * @param gasPrice optionally set the gas price for allowance transactions
+   * @param txPriority optionally set the gas price (via ethgasstation.info) as "fast", "average", or "safeLow"
    */
-  constructor(dealerUri: string, web3Uri?: string, gasPrice: number = 5) {
+  constructor(dealerUri: string, web3Uri?: string, txPriority: GasPriority = "fast") {
     this.initialized = false;
 
     this.web3 = null;
@@ -94,7 +101,7 @@ export class DealerClient {
     this.networkId = null;
     this.coinbase = null;
 
-    this.GAS_PRICE = new BigNumber(gasPrice);
+    this.txPriority = txPriority;
     this.contractWrappers = null;
 
     this.dealerUrl = new URL(dealerUri);
@@ -141,6 +148,8 @@ export class DealerClient {
 
     this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
     this.coinbase = await this.web3.eth.getCoinbase();
+
+    this.GAS_PRICE = await this._getGasPrice(this.txPriority);
     this.pairs = await this._loadMarkets();
     this.tokens = await this._loadAssets();
     this.initialized = true;
@@ -353,7 +362,13 @@ export class DealerClient {
    */
   public async setAllowance(tokenTicker: string): Promise<TransactionReceiptWithDecodedLogs> {
     const tokenAddress = this._getAddress(tokenTicker);
-    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(tokenAddress, { from: this.coinbase });
+    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(
+      tokenAddress,
+      {
+        from: this.coinbase,
+        gasPrice: this.GAS_PRICE,
+      },
+    );
     return this.web3Wrapper.awaitTransactionSuccessAsync(txId);
   }
 
@@ -503,9 +518,9 @@ export class DealerClient {
     }
   }
 
-  private async _call(endpoint: string, method: "GET" | "POST", data?: any): Promise<any> {
+  private async _callAny(url: string, method: "GET" | "POST", data?: any): Promise<any> {
     const response = await axios(
-      `${this.apiBase}/${endpoint}`,
+      url,
       {
         method,
         headers: {
@@ -518,6 +533,10 @@ export class DealerClient {
     return response.data;
   }
 
+  private async _call(endpoint: string, method: "GET" | "POST", data?: any): Promise<any> {
+    return this._callAny(`${this.apiBase}/${endpoint}`, method, data);
+  }
+
   private _getAddress(ticker: string): string {
     const tokenAddress = this.tokens[ticker];
     assert(tokenAddress, "unsupported token ticker");
@@ -526,6 +545,12 @@ export class DealerClient {
 
   private async _loadMarkets(): Promise<string[]> {
     return this._call("markets", "GET");
+  }
+
+  private async _getGasPrice(priority: GasPriority): Promise<BigNumber> {
+    const gasPriceApi = "https://www.etherchain.org/api/gasPriceOracle";
+    const prices = await this._callAny(gasPriceApi, "GET");
+    return new BigNumber(prices[priority]);
   }
 
   private async _loadAssets(): Promise<any> {
