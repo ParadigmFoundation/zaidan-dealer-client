@@ -36,6 +36,8 @@ without needing to manually specify the asset proxy address.
 * [setAllowanceAsync](erc20token.md#setallowanceasync)
 * [setProxyAllowanceAsync](erc20token.md#setproxyallowanceasync)
 * [setUnlimitedProxyAllowanceAsync](erc20token.md#setunlimitedproxyallowanceasync)
+* [transferAsync](erc20token.md#transferasync)
+* [transferFromAsync](erc20token.md#transferfromasync)
 
 ## Constructors
 
@@ -43,7 +45,9 @@ without needing to manually specify the asset proxy address.
 
 \+ **new ERC20Token**(`provider`: SupportedProvider): *[ERC20Token](erc20token.md)*
 
+
 *Defined in [ERC20Token.ts:26](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L26)*
+
 
 Create a new `ERC20Token` instance with a Web3 provider to access convenience
 methods for interacting with arbitrary ERC-20 tokens and the 0x ERC-20 asset
@@ -63,7 +67,9 @@ Name | Type | Description |
 
 ▪ **UNLIMITED_ALLOWANCE**: *BigNumber* =  new BigNumber(2).exponentiatedBy(256).minus(1)
 
+
 *Defined in [ERC20Token.ts:17](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L17)*
+
 
 ## Methods
 
@@ -71,7 +77,9 @@ Name | Type | Description |
 
 ▸ **getAllowanceAsync**(`tokenAddress`: string, `userAddress`: string, `spenderAddress`: string): *Promise‹BigNumber›*
 
+
 *Defined in [ERC20Token.ts:63](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L63)*
+
 
 Fetch user's ERC-20 allowance for a specific spender in base units (wei).
 
@@ -81,9 +89,11 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `tokenAddress` | string | The ERC-20 token contract address. |
 `userAddress` | string | User's address to fetch allowance for. |
-`spenderAddress` | string | The spender address to fetch allowance for.  |
+`spenderAddress` | string | The spender address to fetch allowance for. |
 
 **Returns:** *Promise‹BigNumber›*
+
+A promise that resolves to the spender's allowance for the user's tokens in base units (wei).
 
 ___
 
@@ -91,7 +101,9 @@ ___
 
 ▸ **getBalanceAsync**(`tokenAddress`: string, `userAddress`: string): *Promise‹BigNumber›*
 
+
 *Defined in [ERC20Token.ts:50](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L50)*
+
 
 Fetch user's ERC-20 token balance in base units (wei).
 
@@ -100,9 +112,11 @@ Fetch user's ERC-20 token balance in base units (wei).
 Name | Type | Description |
 ------ | ------ | ------ |
 `tokenAddress` | string | The ERC-20 token contract address. |
-`userAddress` | string | User's address to fetch balance for.  |
+`userAddress` | string | User's address to fetch balance for. |
 
 **Returns:** *Promise‹BigNumber›*
+
+A promise that resolves to the users balance of the provided token in base units (wei).
 
 ___
 
@@ -110,7 +124,9 @@ ___
 
 ▸ **getNetworkIdAsync**(): *Promise‹number›*
 
+
 *Defined in [ERC20Token.ts:145](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L145)*
+
 
 Fetch the current detected networkId.
 
@@ -122,7 +138,9 @@ ___
 
 ▸ **getProxyAddressAsync**(): *Promise‹string›*
 
+
 *Defined in [ERC20Token.ts:153](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L153)*
+
 
 Fetch the 0x ERC-20 asset proxy address for the current network.
 
@@ -134,7 +152,9 @@ ___
 
 ▸ **getProxyAllowanceAsync**(`tokenAddress`: string, `userAddress`: string): *Promise‹BigNumber›*
 
+
 *Defined in [ERC20Token.ts:76](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L76)*
+
 
 Fetch user's 0x ERC-20 proxy allowance for a given token in base units (wei).
 
@@ -143,9 +163,34 @@ Fetch user's 0x ERC-20 proxy allowance for a given token in base units (wei).
 Name | Type | Description |
 ------ | ------ | ------ |
 `tokenAddress` | string | The ERC-20 token contract address. |
-`userAddress` | string | User's address to fetch 0x ERC-20 proxy allowance for.  |
+`userAddress` | string | User's address to fetch 0x ERC-20 proxy allowance for. |
 
 **Returns:** *Promise‹BigNumber›*
+
+A promise that resolves to the users 0x ERC20 proxy allowance for the given token in base units (wei).
+
+___
+
+###  setAllowanceAsync
+
+▸ **setAllowanceAsync**(`tokenAddress`: string, `spenderAddress`: string, `allowance`: BigNumber, `txOptions`: Partial‹TxData›): *Promise‹string›*
+
+*Defined in [ERC20Token.ts:93](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/9186cf2/src/ERC20Token.ts#L93)*
+
+Set user's 0x ERC-20 allowance for a given address in base units (wei).
+
+**Parameters:**
+
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`tokenAddress` | string | - | The ERC-20 token contract address. |
+`spenderAddress` | string | - | The address of the desired spender to set allowance for. |
+`allowance` | BigNumber | - | The desired allowance (in wei) to set for the ERC-20 proxy. |
+`txOptions` | Partial‹TxData› |  {} | Optional transaction options (gas price, etc). |
+
+**Returns:** *Promise‹string›*
+
+A promise that resolves to the resulting transaction hash (TX ID).
 
 ___
 
@@ -176,7 +221,9 @@ ___
 
 ▸ **setProxyAllowanceAsync**(`tokenAddress`: string, `allowance`: BigNumber, `txOptions`: Partial‹TxData›): *Promise‹string›*
 
+
 *Defined in [ERC20Token.ts:109](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L109)*
+
 
 Set user's 0x ERC-20 proxy allowance for a given token in base units (wei).
 
@@ -190,7 +237,7 @@ Name | Type | Default | Description |
 
 **Returns:** *Promise‹string›*
 
-The resulting transaction hash.
+A promise that resolves to the resulting transaction hash (TX ID).
 
 ___
 
@@ -198,7 +245,9 @@ ___
 
 ▸ **setUnlimitedProxyAllowanceAsync**(`tokenAddress`: string, `txOptions`: Partial‹TxData›): *Promise‹string›*
 
+
 *Defined in [ERC20Token.ts:131](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/2606919/src/ERC20Token.ts#L131)*
+
 
 Set an unlimited allowance for the 0x ERC-20 proxy allowance for a given
 token and user address.
@@ -210,6 +259,7 @@ Name | Type | Default | Description |
 `tokenAddress` | string | - | The ERC-20 token contract address. |
 `txOptions` | Partial‹TxData› |  {} | Optional transaction options (gas price, etc). |
 
+
 **Returns:** *Promise‹string›*
 
-The resulting transaction hash.
+A promise that resolves to the resulting transaction hash (TX ID).

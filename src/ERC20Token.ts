@@ -46,6 +46,7 @@ export class ERC20Token {
      *
      * @param tokenAddress The ERC-20 token contract address.
      * @param userAddress User's address to fetch balance for.
+     * @returns A promise that resolves to the users balance of the provided token in base units (wei).
      */
     public async getBalanceAsync(tokenAddress: string, userAddress: string): Promise<BigNumber> {
         const token = this.getTokenContract(tokenAddress);
@@ -59,6 +60,7 @@ export class ERC20Token {
      * @param tokenAddress The ERC-20 token contract address.
      * @param userAddress User's address to fetch allowance for.
      * @param spenderAddress The spender address to fetch allowance for.
+     * @returns A promise that resolves to the spender's allowance for the user's tokens in base units (wei).
      */
     public async getAllowanceAsync(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BigNumber> {
         const user = this.normalizeAddress(userAddress);
@@ -72,6 +74,7 @@ export class ERC20Token {
      *
      * @param tokenAddress The ERC-20 token contract address.
      * @param userAddress User's address to fetch 0x ERC-20 proxy allowance for.
+     * @returns A promise that resolves to the users 0x ERC20 proxy allowance for the given token in base units (wei).
      */
     public async getProxyAllowanceAsync(tokenAddress: string, userAddress: string): Promise<BigNumber> {
         const proxyAddress = await this.getProxyAddressAsync();
@@ -85,7 +88,7 @@ export class ERC20Token {
      * @param spenderAddress The address of the desired spender to set allowance for.
      * @param allowance The desired allowance (in wei) to set for the ERC-20 proxy.
      * @param txOptions Optional transaction options (gas price, etc).
-     * @returns The resulting transaction hash.
+     * @returns A promise that resolves to the resulting transaction hash (TX ID).
      */
     public async setAllowanceAsync(
         tokenAddress: string,
@@ -104,7 +107,7 @@ export class ERC20Token {
      * @param tokenAddress The ERC-20 token contract address.
      * @param allowance The desired allowance (in wei) to set for the ERC-20 proxy.
      * @param txOptions Optional transaction options (gas price, etc).
-     * @returns The resulting transaction hash.
+     * @returns A promise that resolves to the resulting transaction hash (TX ID).
      */
     public async setProxyAllowanceAsync(
         tokenAddress: string,
@@ -126,7 +129,7 @@ export class ERC20Token {
      *
      * @param tokenAddress The ERC-20 token contract address.
      * @param txOptions Optional transaction options (gas price, etc).
-     * @returns The resulting transaction hash.
+     * @returns A promise that resolves to the resulting transaction hash (TX ID).
      */
     public async setUnlimitedProxyAllowanceAsync(
         tokenAddress: string,
@@ -135,6 +138,60 @@ export class ERC20Token {
         return this.setProxyAllowanceAsync(
             tokenAddress,
             ERC20Token.UNLIMITED_ALLOWANCE,
+            txOptions,
+        );
+    }
+
+    /**
+     * Call the `transferFrom` method on an ERC20 token contract (allowance must
+     * be set for the spender).
+     *
+     * @param tokenAddress The ERC-20 token contract address.
+     * @param toAddress The address to transfer assets to (receiver).
+     * @param fromAddress The spender address (must be approved).
+     * @param amount The amount to transfer in base units (wei).
+     * @param txOptions Optional transaction options (gas price, etc).
+     * @returns A promise that resolves to the resulting transaction hash (TX ID).
+     */
+    public async transferFromAsync(
+        tokenAddress: string,
+        toAddress: string,
+        fromAddress: string,
+        amount: BigNumber,
+        txOptions: Partial<TxData> = {},
+    ): Promise<string> {
+        const token = await this.getTokenContract(tokenAddress);
+        const to = this.normalizeAddress(toAddress);
+        const from = this.normalizeAddress(fromAddress);
+        return token.transferFrom.validateAndSendTransactionAsync(
+            from,
+            to,
+            amount,
+            txOptions,
+        );
+    }
+
+    /**
+     * Call the `transfer` method on an ERC20 token contract to transfer some
+     * amount of tokens.
+     *
+     * @param tokenAddress The ERC-20 token contract address.
+     * @param toAddress The address to transfer assets to (receiver).
+     * @param amount The amount to transfer in base units (wei).
+     * @param txOptions Optional transaction options (gas price, etc).
+     * @returns A promise that resolves to the resulting transaction hash (TX ID).
+     */
+    public async transferAsync(
+        tokenAddress: string,
+        toAddress: string,
+        amount: BigNumber,
+        txOptions: Partial<TxData> = {},
+    ): Promise<string> {
+        const token = await this.getTokenContract(tokenAddress);
+        const to = this.normalizeAddress(toAddress);
+        return token.transfer.validateAndSendTransactionAsync(
+            to,
+            amount,
             txOptions,
         );
     }
