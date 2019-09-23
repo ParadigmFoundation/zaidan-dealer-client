@@ -549,8 +549,8 @@ export class DealerClient {
 
   private async _getGasPrice(priority: GasPriority): Promise<BigNumber> {
     const gasPriceApi = "https://www.etherchain.org/api/gasPriceOracle";
-    const prices = await this._callAny(gasPriceApi, "GET");
-    return new BigNumber(prices[priority]);
+    const prices = await axios(gasPriceApi);
+    return new BigNumber(prices.data[priority]);
   }
 
   private async _loadAssets(): Promise<any> {
