@@ -51,6 +51,7 @@
     "typedoc-plugin-markdown": "^2.0.1",
     "typescript": "^3.5.3",
     "uuid": "^3.3.3",
+    "vue-simple-spinner": "^1.2.8",
     "vuepress": "^0.14.8",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",

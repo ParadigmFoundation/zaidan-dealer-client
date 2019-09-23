@@ -266,9 +266,9 @@ function find(page, items, offset) {
     padding-right: 10px;
     border-radius: 4px;
     opacity: 0.5;
-    box-shadow: 0px 5px 15px 0 rgba(0, 0, 0, 0.07);
-    border: solid 1px #ededed;
-    background-color: #ffffff;
+    // box-shadow: 0px 5px 15px 0 rgba(0, 0, 0, 0.07);
+    // border: solid 1px #ededed;
+    // background-color: #ffffff;
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 33px;
