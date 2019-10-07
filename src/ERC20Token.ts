@@ -249,6 +249,6 @@ export class ERC20Token {
      */
     private normalizeAddress(address: string): string {
         assert(/^0x[a-fA-F0-9]{40}$/.test(address), "ERC20Token: invalid Ethereum address");
-        return address.toString();
+        return address.toLowerCase();
     }
 }
