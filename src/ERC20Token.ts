@@ -1,7 +1,9 @@
-import { BigNumber, ERC20TokenContract, SupportedProvider, TxData } from "0x.js";
+import { ERC20TokenContract } from "@0x/abi-gen-wrappers";
 import { ContractAddresses, getContractAddressesForNetworkOrThrow } from "@0x/contract-addresses";
+import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import assert from "assert";
+import { SupportedProvider, TxData } from "ethereum-types";
 
 /**
  * Convenience class for interacting with multiple ERC-20 tokens through a single

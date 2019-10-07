@@ -1,20 +1,22 @@
-import {
-  BigNumber,
-  ContractWrappers,
-  generatePseudoRandomSalt,
-  signatureUtils,
-  SignedOrder,
-  transactionHashUtils,
-} from "0x.js";
+import { ContractWrappers } from "@0x/contract-wrappers";
 import { MetamaskSubprovider } from "@0x/subproviders";
+import { SignedOrder, SignedZeroExTransaction } from "@0x/types";
+import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import assert from "assert";
 import axios from "axios";
-import { TransactionReceiptWithDecodedLogs } from "ethereum-types";
+import { Provider, SupportedProvider, TransactionReceiptWithDecodedLogs } from "ethereum-types";
 import Web3 from "web3";
 
-import { DealerResponse, ERC20Token } from ".";
-import { GasPriority } from "./types";
+import {
+  convertZeroExTransactionToDealerFill,
+  createAndSignZeroExTransaction,
+  ERC20Token,
+  GasPriority,
+  getGasPrice,
+  QuoteResponse,
+  SwapResponse,
+} from ".";
 
 /**
  * A simple client for the Zaidan dealer server.
@@ -51,8 +53,8 @@ export class DealerClient {
   /** Provides additional convenience methods for interacting with web3. */
   public web3Wrapper: Web3Wrapper;
 
-  /** SubProvider instance used to interact with MetaMask. */
-  public subProvider: MetamaskSubprovider;
+  /** Provider instance used to interact with Ethereum. */
+  public provider: Provider | SupportedProvider | MetamaskSubprovider;
 
   /** Stores the configured Ethereum network ID. */
   public networkId: number;
@@ -69,7 +71,7 @@ export class DealerClient {
   /** Set to 'true' if browser environment is detected. */
   public isBrowser: boolean;
 
-  /** Default gas price to use for allowance transactions. */
+  /** Default gas price to use for allowance transactions (in wei). */
   public GAS_PRICE: BigNumber;
 
   /**
@@ -89,14 +91,14 @@ export class DealerClient {
    *
    * @param dealerUri the base RPC API path for the dealer server
    * @param web3Uri optional Ethereum JSONRPC url for server-side usage
-   * @param txPriority optionally set the gas price (via ethgasstation.info) as "fast", "average", or "safeLow"
+   * @param txPriority optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"
    */
   constructor(dealerUri: string, web3Uri?: string, txPriority: GasPriority = "fast") {
     this.initialized = false;
 
     this.web3 = null;
     this.web3Wrapper = null;
-    this.subProvider = null;
+    this.provider = null;
 
     this.networkId = null;
     this.coinbase = null;
@@ -124,32 +126,26 @@ export class DealerClient {
     if (this.web3Url) {
       this.isBrowser = false;
       this.web3 = new Web3(this.web3Url.href);
-      this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
-      this.networkId = await this.web3Wrapper.getNetworkIdAsync();
-      this.contractWrappers = new ContractWrappers(
-        this.web3.currentProvider,
-        {
-          networkId: this.networkId,
-        },
-      );
+      this.provider = this.web3.currentProvider;
     } else {
-      this.isBrowser = true;
       await this._connectMetamask();
-      this.web3Wrapper = new Web3Wrapper((window as any).ethereum);
-      this.subProvider = new MetamaskSubprovider((window as any).ethereum);
-      this.networkId = await this.web3Wrapper.getNetworkIdAsync();
-      this.contractWrappers = new ContractWrappers(
-        this.subProvider,
-        {
-          networkId: this.networkId,
-        },
-      );
+      this.isBrowser = true;
+      this.provider = new MetamaskSubprovider((window as any).ethereum);
     }
+
+    this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
+    this.networkId = await this.web3Wrapper.getNetworkIdAsync();
+    this.contractWrappers = new ContractWrappers(
+      this.web3.currentProvider,
+      {
+        networkId: this.networkId,
+      },
+    );
 
     this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
     this.coinbase = await this.web3.eth.getCoinbase();
 
-    this.GAS_PRICE = await this._getGasPrice(this.txPriority);
+    this.GAS_PRICE = await getGasPrice(this.txPriority);
     this.pairs = await this._loadMarkets();
     this.tokens = await this._loadAssets();
     this.initialized = true;
@@ -184,7 +180,7 @@ export class DealerClient {
    * }
    * ```
    */
-  public async getQuote(size: number, symbol: string, side: string): Promise<DealerResponse> {
+  public async getQuote(size: number, symbol: string, side: string): Promise<QuoteResponse> {
     assert(this.initialized, "not initialized (call .init() first)");
     assert(side === "bid" || side === "ask", 'side must be "bid" or "ask"');
     assert(this.pairs.includes(symbol), "unsupported token pair (see .pairs)");
@@ -226,7 +222,7 @@ export class DealerClient {
     size: number,
     clientAsset: string,
     dealerAsset: string,
-  ): Promise<DealerResponse> {
+  ): Promise<SwapResponse> {
     assert(this.initialized, "not initialized (call .init() first)");
     assert(typeof size === "number", "size must be a number");
     const dealerBase = `${dealerAsset}/${clientAsset}`;
@@ -243,7 +239,7 @@ export class DealerClient {
   /**
    * Sign a 0x `fillOrder` transaction message, and submit it back to the
    * server for settlement. Signs a fill transaction for the entire specified
-   * `takerAssetAmount`.
+   * `takerAssetAmount`. Implements ZEIP-18 signing of the provided `order` object.
    *
    * Allowances should be checked prior to calling this method.
    *
@@ -268,38 +264,25 @@ export class DealerClient {
    * await dealer.waitForTransactionSuccessOrThrow(txId);
    * ```
    */
-  public async handleTrade(order: SignedOrder, quoteId: string): Promise<string> {
+  public async handleTrade(order: SignedOrder, quoteId: string, takerAddress: string = this.coinbase): Promise<string> {
     const takerAmount = new BigNumber(order.takerAssetAmount);
+    const verifyingContractAddress = this.contractWrappers.exchange.address;
 
-    // generate and sign ZEIP-18 0x fill transaction
-    const data = this.contractWrappers.exchange.fillOrder.getABIEncodedTransactionData(order, takerAmount, order.signature);
-    const salt = generatePseudoRandomSalt();
-    const fillTx = {
-      verifyingContractAddress: this.contractWrappers.exchange.address,
-      salt,
-      signerAddress: this.coinbase,
-      data,
-    };
-
-    const hash = transactionHashUtils.getTransactionHashHex(fillTx);
-    const sig = await signatureUtils.ecSignHashAsync(
-      // use metamask provider if in browser, otherwise regular web3
-      this.subProvider || this.web3.currentProvider,
-
-      hash,
-      this.coinbase,
-    );
-
-    const req = {
-      salt,
-      data,
-      hash,
-      sig,
-      quoteId,
-      address: this.coinbase,
-    };
+    let signedFillTx: SignedZeroExTransaction;
+    try {
+      signedFillTx = await createAndSignZeroExTransaction(
+        this.provider,
+        takerAddress,
+        verifyingContractAddress,
+        order,
+        takerAmount,
+      );
+    } catch (error) {
+      throw new Error(`failed to sign fill transaction: ${error.message}`);
+    }
 
     try {
+      const req = convertZeroExTransactionToDealerFill(signedFillTx, quoteId);
       const { txId } = await this._call("order", "POST", req);
       return txId;
     } catch (error) {
@@ -362,15 +345,9 @@ export class DealerClient {
    */
   public async setAllowance(tokenTicker: string): Promise<TransactionReceiptWithDecodedLogs> {
     const tokenAddress = this._getAddress(tokenTicker);
-    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(
-      tokenAddress,
-      {
-        from: this.coinbase,
-
-        // convert to wei
-        gasPrice: this.GAS_PRICE.multipliedBy("1e9"),
-      },
-    );
+    const from = this.coinbase;
+    const gasPrice = this.GAS_PRICE;
+    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(tokenAddress, { from, gasPrice });
     return this.web3Wrapper.awaitTransactionSuccessAsync(txId);
   }
 
@@ -420,7 +397,7 @@ export class DealerClient {
    * ```
    */
   public makeBigNumber(n: number | string): BigNumber {
-    assert(typeof n === "number" || typeof n !== "string", "n must be a number or string number");
+    assert(typeof n === "number" || typeof n !== "string", '"n" must be a number or string number');
     return new BigNumber(n);
   }
 
@@ -547,17 +524,6 @@ export class DealerClient {
 
   private async _loadMarkets(): Promise<string[]> {
     return this._call("markets", "GET");
-  }
-
-  // attempts to get from etherchain, on failure returns 12
-  private async _getGasPrice(priority: GasPriority): Promise<BigNumber> {
-    const gasPriceApi = "https://www.etherchain.org/api/gasPriceOracle";
-    try {
-      const prices = await axios(gasPriceApi);
-      return new BigNumber(prices.data[priority]);
-    } catch {
-      return new BigNumber(12);
-    }
   }
 
   private async _loadAssets(): Promise<any> {
