@@ -38,9 +38,13 @@ module.exports = {
                 food: "1.svg",
                 children: [
                     "/",
+                    "/globals",
                     "classes/dealerclient",
                     "classes/erc20token",
                     "interfaces/dealerresponse",
+                    "interfaces/quoteresponse",
+                    "interfaces/swapresponse",
+                    "interfaces/dealerfilltransaction",
                 ]
             },
         ]
