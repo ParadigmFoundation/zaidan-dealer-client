@@ -1,7 +1,7 @@
+import { DummyERC20TokenContract } from "@0x/abi-gen-wrappers";
 import { ContractWrappers } from "@0x/contract-wrappers";
 import { BigNumber } from "@0x/utils";
-import { DummyERC20TokenContract } from "@0x/abi-gen-wrappers";
-import assert, { doesNotReject } from "assert";
+import assert from "assert";
 import { Server } from "http";
 import Web3 from "web3";
 
