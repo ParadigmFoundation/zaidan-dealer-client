@@ -40,7 +40,6 @@ module.exports = {
                     "/",
                     "/globals",
                     "classes/dealerclient",
-                    "classes/erc20token",
                     "interfaces/dealerresponse",
                     "interfaces/quoteresponse",
                     "interfaces/swapresponse",

@@ -1,4 +1,5 @@
-import { BigNumber, ContractWrappers } from "0x.js";
+import { ContractWrappers } from "@0x/contract-wrappers";
+import { BigNumber } from "@0x/utils";
 import { DummyERC20TokenContract } from "@0x/abi-gen-wrappers";
 import assert, { doesNotReject } from "assert";
 import { Server } from "http";

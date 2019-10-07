@@ -3,6 +3,7 @@ import { MetamaskSubprovider } from "@0x/subproviders";
 import { SignedOrder, SignedZeroExTransaction } from "@0x/types";
 import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
+import { ERC20Token } from "@habsyr/erc20-token";
 import assert from "assert";
 import axios from "axios";
 import { Provider, SupportedProvider, TransactionReceiptWithDecodedLogs } from "ethereum-types";
@@ -11,7 +12,6 @@ import Web3 from "web3";
 import {
   convertZeroExTransactionToDealerFill,
   createAndSignZeroExTransaction,
-  ERC20Token,
   GasPriority,
   getGasPrice,
   QuoteResponse,
