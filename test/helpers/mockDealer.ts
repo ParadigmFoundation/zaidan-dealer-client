@@ -1,10 +1,6 @@
-import {
-    assetDataUtils,
-    BigNumber,
-    ContractWrappers,
-    generatePseudoRandomSalt,
-    signatureUtils,
-} from "0x.js";
+import { ContractWrappers } from "@0x/contract-wrappers";
+import { assetDataUtils, generatePseudoRandomSalt, signatureUtils } from "@0x/order-utils";
+import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import bodyParser from "body-parser";
 import express from "express";
