@@ -51,7 +51,7 @@ class MockDealer {
         this.initialized = true;
     }
 
-    public async mock(size: number, side: "bid" | "ask"): Promise<DealerResponse> {
+    public async mock(size: number, side: "bid" | "ask", takerAddress: string): Promise<DealerResponse> {
         await this.initializing;
 
         const takerAmount = (size * 0.2).toString();
@@ -69,6 +69,7 @@ class MockDealer {
             fee: 0,
             price: 0.2,
             order: await this.generateOrder(sizeStr, takerAmount, this.tokenA, this.tokenB, expiration),
+            takerAddress,
         };
         return mock;
     }
@@ -130,9 +131,10 @@ router.get("/quote", async (req, res, next) => {
     const {
         side,
         size,
+        takerAddress,
     } = req.query;
 
-    const quote = await dealer.mock(parseInt(size), side);
+    const quote = await dealer.mock(parseInt(size), side, takerAddress);
     res.status(200).send(quote);
 });
 
@@ -163,4 +165,4 @@ router.get("/markets", async (req, res, next) => {
 });
 
 app.use(bodyParser.json());
-app.use("/api/v1.0", router);
+app.use("/api/v2.0", router);

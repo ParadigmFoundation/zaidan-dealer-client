@@ -3,6 +3,7 @@ import { ContractWrappers } from "@0x/contract-wrappers";
 import { BigNumber } from "@0x/utils";
 import assert from "assert";
 import { Server } from "http";
+import Redis from "ioredis";
 import Web3 from "web3";
 
 import { DealerClient } from "../src/DealerClient";
@@ -81,11 +82,8 @@ describe("Zaidan client unit tests", function (): void {
         clientAddress = accounts[parseInt(CLIENT_ACCOUNT_INDEX)];
         dealerAddress = accounts[parseInt(DEALER_ACCOUNT_INDEX)];
 
-        client = new DealerClient(DEALER_URL, WEB3_URL);
+        client = new DealerClient(DEALER_URL, { providerUrl: WEB3_URL, takerAddress: clientAddress });
         await client.init();
-
-        // override client coinbase to avoid conflicting coinbase addresses
-        client.coinbase = clientAddress;
     });
 
     this.beforeAll("setup dummy tokens and server allowances", async function (): Promise<void> {
