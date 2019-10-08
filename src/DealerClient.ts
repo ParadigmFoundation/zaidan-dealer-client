@@ -162,7 +162,7 @@ export class DealerClient {
    * @returns `true` if the specified taker will be allowed to trade with the dealer.
    */
   public async isAuthorized(takerAddress: string = this.coinbase): Promise<boolean> {
-    const { authorized } = await this._call("authorized", "GET", { takerAddress });
+    const { authorized } = await this._call("authorized", "GET", { address: takerAddress });
     return authorized;
   }
 
