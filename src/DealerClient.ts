@@ -26,6 +26,9 @@ export class DealerClient {
   /** 2^256 - 1 represents an effectively "unlimited" allowance */
   public static MAX_ALLOWANCE = new BigNumber(2).exponentiatedBy(256).minus(1);
 
+  /** The dealer API version this client is compatible with. */
+  public static COMPATIBLE_VERSION = "2.0";
+
   /** Dealer server RPC server URL. */
   private readonly dealerUrl: URL;
 
@@ -109,7 +112,7 @@ export class DealerClient {
     this.contractWrappers = null;
 
     this.dealerUrl = new URL(dealerUri);
-    this.apiBase = `${this.dealerUrl.href}api/v2.0`;
+    this.apiBase = `${this.dealerUrl.href}api/v${DealerClient.COMPATIBLE_VERSION}`;
 
     if (providerUrl) {
       this.web3Url = new URL(providerUrl);
