@@ -2,7 +2,6 @@
 
 # Class: DealerClient
 
-
 A simple client for the Zaidan dealer server.
 
 ## Hierarchy
@@ -29,6 +28,7 @@ A simple client for the Zaidan dealer server.
 * [txPriority](dealerclient.md#txpriority)
 * [web3](dealerclient.md#web3)
 * [web3Wrapper](dealerclient.md#web3wrapper)
+* [COMPATIBLE_VERSION](dealerclient.md#static-compatible_version)
 * [MAX_ALLOWANCE](dealerclient.md#static-max_allowance)
 
 ### Methods
@@ -41,6 +41,7 @@ A simple client for the Zaidan dealer server.
 * [handleTrade](dealerclient.md#handletrade)
 * [hasAllowance](dealerclient.md#hasallowance)
 * [init](dealerclient.md#init)
+* [isAuthorized](dealerclient.md#isauthorized)
 * [makeBigNumber](dealerclient.md#makebignumber)
 * [setAllowance](dealerclient.md#setallowance)
 * [supportedTickers](dealerclient.md#supportedtickers)
@@ -51,9 +52,9 @@ A simple client for the Zaidan dealer server.
 
 ###  constructor
 
-\+ **new DealerClient**(`dealerUri`: string, `web3Uri?`: string, `txPriority`: [GasPriority](../globals.md#gaspriority)): *[DealerClient](dealerclient.md)*
+\+ **new DealerClient**(`dealerUri`: string, `options`: [DealerOptions](../interfaces/dealeroptions.md)): *[DealerClient](dealerclient.md)*
 
-*Defined in [DealerClient.ts:81](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L81)*
+*Defined in [DealerClient.ts:85](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L85)*
 
 Instantiate a new DealerClient. Prior to use, `client.init()` should
 be called, which triggers a prompt for the user to allow MetaMask to
@@ -65,11 +66,10 @@ setting of attempting to load a web3 provider through the browser.
 
 **Parameters:**
 
-Name | Type | Default | Description |
------- | ------ | ------ | ------ |
-`dealerUri` | string | - | the base RPC API path for the dealer server |
-`web3Uri?` | string | - | optional Ethereum JSONRPC url for server-side usage |
-`txPriority` | [GasPriority](../globals.md#gaspriority) | "fast" | optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"  |
+Name | Type | Description |
+------ | ------ | ------ |
+`dealerUri` | string | the base RPC API path for the dealer server |
+`options` | [DealerOptions](../interfaces/dealeroptions.md) | - |
 
 **Returns:** *[DealerClient](dealerclient.md)*
 
@@ -79,7 +79,7 @@ Name | Type | Default | Description |
 
 • **GAS_PRICE**: *BigNumber*
 
-*Defined in [DealerClient.ts:75](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L75)*
+*Defined in [DealerClient.ts:79](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L79)*
 
 Default gas price to use for allowance transactions (in wei).
 
@@ -89,7 +89,7 @@ ___
 
 • **coinbase**: *string*
 
-*Defined in [DealerClient.ts:63](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L63)*
+*Defined in [DealerClient.ts:67](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L67)*
 
 Stores the current user's coinbase address.
 
@@ -99,7 +99,7 @@ ___
 
 • **contractWrappers**: *ContractWrappers*
 
-*Defined in [DealerClient.ts:66](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L66)*
+*Defined in [DealerClient.ts:70](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L70)*
 
 Initialized contract wrappers for interacting with the 0x system.
 
@@ -109,7 +109,7 @@ ___
 
 • **initialized**: *boolean*
 
-*Defined in [DealerClient.ts:69](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L69)*
+*Defined in [DealerClient.ts:73](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L73)*
 
 Set to 'true' after a successful .init(), must be called before use.
 
@@ -119,7 +119,7 @@ ___
 
 • **isBrowser**: *boolean*
 
-*Defined in [DealerClient.ts:72](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L72)*
+*Defined in [DealerClient.ts:76](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L76)*
 
 Set to 'true' if browser environment is detected.
 
@@ -129,7 +129,7 @@ ___
 
 • **networkId**: *number*
 
-*Defined in [DealerClient.ts:60](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L60)*
+*Defined in [DealerClient.ts:64](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L64)*
 
 Stores the configured Ethereum network ID.
 
@@ -139,7 +139,7 @@ ___
 
 • **pairs**: *string[]*
 
-*Defined in [DealerClient.ts:43](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L43)*
+*Defined in [DealerClient.ts:47](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L47)*
 
 An array of the currently supported pairs (as expected by `getQuote`).
 
@@ -149,7 +149,7 @@ ___
 
 • **provider**: *Provider | SupportedProvider | MetamaskSubprovider*
 
-*Defined in [DealerClient.ts:57](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L57)*
+*Defined in [DealerClient.ts:61](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L61)*
 
 Provider instance used to interact with Ethereum.
 
@@ -159,7 +159,7 @@ ___
 
 • **tokens**: *object*
 
-*Defined in [DealerClient.ts:48](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L48)*
+*Defined in [DealerClient.ts:52](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L52)*
 
 Maps tokenTicker => address for looking up common tokens.
 
@@ -173,7 +173,7 @@ ___
 
 • **txPriority**: *[GasPriority](../globals.md#gaspriority)*
 
-*Defined in [DealerClient.ts:81](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L81)*
+*Defined in [DealerClient.ts:85](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L85)*
 
 Transaction priority (according to ethgasstation.info API), defaults to
 fast.
@@ -184,7 +184,7 @@ ___
 
 • **web3**: *Web3*
 
-*Defined in [DealerClient.ts:51](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L51)*
+*Defined in [DealerClient.ts:55](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L55)*
 
 Main Web3 instance for interacting with Ethereum.
 
@@ -194,9 +194,19 @@ ___
 
 • **web3Wrapper**: *Web3Wrapper*
 
-*Defined in [DealerClient.ts:54](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L54)*
+*Defined in [DealerClient.ts:58](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L58)*
 
 Provides additional convenience methods for interacting with web3.
+
+___
+
+### `Static` COMPATIBLE_VERSION
+
+▪ **COMPATIBLE_VERSION**: *string* = "2.0"
+
+*Defined in [DealerClient.ts:30](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L30)*
+
+The dealer API version this client is compatible with.
 
 ___
 
@@ -204,7 +214,7 @@ ___
 
 ▪ **MAX_ALLOWANCE**: *BigNumber* =  new BigNumber(2).exponentiatedBy(256).minus(1)
 
-*Defined in [DealerClient.ts:26](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L26)*
+*Defined in [DealerClient.ts:27](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L27)*
 
 2^256 - 1 represents an effectively "unlimited" allowance
 
@@ -214,7 +224,7 @@ ___
 
 ▸ **fromWei**(`weiAmount`: string): *string*
 
-*Defined in [DealerClient.ts:420](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L420)*
+*Defined in [DealerClient.ts:445](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L445)*
 
 Convert a number of tokens, denominated in the smallest unit - "wei" - to
 "full" units, called "ether". One ether = 1*10^18 wei.
@@ -244,7 +254,7 @@ ___
 
 ▸ **getBalance**(`tokenTicker`: string): *Promise‹string›*
 
-*Defined in [DealerClient.ts:370](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L370)*
+*Defined in [DealerClient.ts:395](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L395)*
 
 Return the user's balance (in wei) of a specified supported token. Only
 supported tickers will work (see `client.tokens`).
@@ -274,7 +284,7 @@ ___
 
 ▸ **getEtherscanLink**(`txId`: string): *string*
 
-*Defined in [DealerClient.ts:454](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L454)*
+*Defined in [DealerClient.ts:479](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L479)*
 
 Returns the URL of the Etherscan status page for the specified TX ID.
 
@@ -294,9 +304,9 @@ ___
 
 ###  getQuote
 
-▸ **getQuote**(`size`: number, `symbol`: string, `side`: string): *Promise‹[QuoteResponse](../interfaces/quoteresponse.md)›*
+▸ **getQuote**(`size`: number, `symbol`: string, `side`: string, `takerAddress`: string): *Promise‹[QuoteResponse](../interfaces/quoteresponse.md)›*
 
-*Defined in [DealerClient.ts:183](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L183)*
+*Defined in [DealerClient.ts:202](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L202)*
 
 Request a price quote a signed order from the dealer server. The response
 includes price and fee information, as well as signed 0x order message for
@@ -323,11 +333,12 @@ response = {
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`size` | number | the amount of tokens the user is selling/buying (in units of base asset) |
-`symbol` | string | the token pair the swap is for (ex: "WETH/DAI") |
-`side` | string | either 'bid' or 'ask' depending on desired quote side |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`size` | number | - | the amount of tokens the user is selling/buying (in units of base asset) |
+`symbol` | string | - | the token pair the swap is for (ex: "WETH/DAI") |
+`side` | string | - | either 'bid' or 'ask' depending on desired quote side |
+`takerAddress` | string |  this.coinbase | optionally override the default (must be able to sign) |
 
 **Returns:** *Promise‹[QuoteResponse](../interfaces/quoteresponse.md)›*
 
@@ -337,9 +348,9 @@ ___
 
 ###  getSwapQuote
 
-▸ **getSwapQuote**(`size`: number, `clientAsset`: string, `dealerAsset`: string): *Promise‹[SwapResponse](../interfaces/swapresponse.md)›*
+▸ **getSwapQuote**(`size`: number, `clientAsset`: string, `dealerAsset`: string, `takerAddress`: string): *Promise‹[SwapResponse](../interfaces/swapresponse.md)›*
 
-*Defined in [DealerClient.ts:221](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L221)*
+*Defined in [DealerClient.ts:245](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L245)*
 
 An alternative interface for fetching a price quote using the concept of
 an asset "swap" as opposed to a conventional base/quote bid/ask interface.
@@ -365,11 +376,12 @@ const txId = await dealer.handleTrade(order, id);
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`size` | number | the amount of takerAsset to swap for |
-`clientAsset` | string | the ticker of the asset being sold (swapping for dealerAsset) |
-`dealerAsset` | string | the ticker of the asset being bought that a price is quoted for |
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`size` | number | - | the amount of takerAsset to swap for |
+`clientAsset` | string | - | the ticker of the asset being sold (swapping for dealerAsset) |
+`dealerAsset` | string | - | the ticker of the asset being bought that a price is quoted for |
+`takerAddress` | string |  this.coinbase | - |
 
 **Returns:** *Promise‹[SwapResponse](../interfaces/swapresponse.md)›*
 
@@ -381,7 +393,7 @@ ___
 
 ▸ **handleTrade**(`order`: SignedOrder, `quoteId`: string, `takerAddress`: string): *Promise‹string›*
 
-*Defined in [DealerClient.ts:267](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L267)*
+*Defined in [DealerClient.ts:292](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L292)*
 
 Sign a 0x `fillOrder` transaction message, and submit it back to the
 server for settlement. Signs a fill transaction for the entire specified
@@ -424,7 +436,7 @@ ___
 
 ▸ **hasAllowance**(`tokenTicker`: string): *Promise‹boolean›*
 
-*Defined in [DealerClient.ts:312](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L312)*
+*Defined in [DealerClient.ts:337](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L337)*
 
 Check if the user has set an allowance for the specified token. If the
 method returns `false`, allowance can be set with `client.setAllowance`.
@@ -457,7 +469,7 @@ ___
 
 ▸ **init**(): *Promise‹void›*
 
-*Defined in [DealerClient.ts:125](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L125)*
+*Defined in [DealerClient.ts:130](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L130)*
 
 Initialize a DealerClient instance. A call to `client.init()` will trigger
 a MetaMask pop-up prompting the user to sign in, or allow the site access.
@@ -470,11 +482,32 @@ A promise that resolves when initialization is complete.
 
 ___
 
+###  isAuthorized
+
+▸ **isAuthorized**(`takerAddress`: string): *Promise‹boolean›*
+
+*Defined in [DealerClient.ts:167](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L167)*
+
+Check if a taker's address will be allowed to trade with the dealer based
+on the dealer's configured whitelist/blacklist.
+
+**Parameters:**
+
+Name | Type | Default | Description |
+------ | ------ | ------ | ------ |
+`takerAddress` | string |  this.coinbase | specify the taker address to check status for. |
+
+**Returns:** *Promise‹boolean›*
+
+`true` if the specified taker will be allowed to trade with the dealer.
+
+___
+
 ###  makeBigNumber
 
 ▸ **makeBigNumber**(`n`: number | string): *BigNumber*
 
-*Defined in [DealerClient.ts:399](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L399)*
+*Defined in [DealerClient.ts:424](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L424)*
 
 Turn a `string` or primitive `number` into a `BigNumber` for math reasons.
 
@@ -500,7 +533,7 @@ ___
 
 ▸ **setAllowance**(`tokenTicker`: string): *Promise‹TransactionReceiptWithDecodedLogs›*
 
-*Defined in [DealerClient.ts:346](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L346)*
+*Defined in [DealerClient.ts:371](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L371)*
 
 Set an unlimited proxy allowance for the 0x ERC20 Proxy contract for the
 specified token ticker.
@@ -535,7 +568,7 @@ ___
 
 ▸ **supportedTickers**(): *string[]*
 
-*Defined in [DealerClient.ts:477](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L477)*
+*Defined in [DealerClient.ts:502](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L502)*
 
 Return an array containing the list of supported token tickers.
 
@@ -554,7 +587,7 @@ ___
 
 ▸ **toWei**(`etherAmount`: string): *string*
 
-*Defined in [DealerClient.ts:441](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L441)*
+*Defined in [DealerClient.ts:466](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L466)*
 
 Convert a number of tokens (full units, called "ether") to "wei", the
 smallest denomination of most ERC-20 tokens with 18 decimals.
@@ -584,7 +617,7 @@ ___
 
 ▸ **waitForTransactionSuccessOrThrow**(`txId`: string): *Promise‹void›*
 
-*Defined in [DealerClient.ts:382](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/DealerClient.ts#L382)*
+*Defined in [DealerClient.ts:407](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/DealerClient.ts#L407)*
 
 Wait for a specific Ethereum transaction to be successfully mined.
 

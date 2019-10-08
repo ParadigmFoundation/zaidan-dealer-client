@@ -2,7 +2,6 @@
 
 # Interface: QuoteResponse
 
-
 The dealer's response for a currency pair quote (bid/ask on X/Y pair).
 
 ## Hierarchy
@@ -23,6 +22,7 @@ The dealer's response for a currency pair quote (bid/ask on X/Y pair).
 * [price](quoteresponse.md#price)
 * [side](quoteresponse.md#side)
 * [size](quoteresponse.md#size)
+* [takerAddress](quoteresponse.md#takeraddress)
 
 ## Properties
 
@@ -32,7 +32,7 @@ The dealer's response for a currency pair quote (bid/ask on X/Y pair).
 
 *Inherited from [DealerResponse](dealerresponse.md).[expiration](dealerresponse.md#expiration)*
 
-*Defined in [types.ts:8](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L8)*
+*Defined in [types.ts:25](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L25)*
 
 The UNIX timestamp at which this offer expires.
 
@@ -44,7 +44,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[fee](dealerresponse.md#fee)*
 
-*Defined in [types.ts:23](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L23)*
+*Defined in [types.ts:40](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L40)*
 
 The required fee from the dealer server.
 
@@ -56,7 +56,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[id](dealerresponse.md#id)*
 
-*Defined in [types.ts:14](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L14)*
+*Defined in [types.ts:31](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L31)*
 
 The unique request ID that refers to this offer.
 
@@ -68,7 +68,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[order](dealerresponse.md#order)*
 
-*Defined in [types.ts:26](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L26)*
+*Defined in [types.ts:43](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L43)*
 
 The signed maker order from the dealer server.
 
@@ -80,7 +80,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[pair](dealerresponse.md#pair)*
 
-*Defined in [types.ts:11](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L11)*
+*Defined in [types.ts:28](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L28)*
 
 The market symbol the quote is for
 
@@ -92,7 +92,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[price](dealerresponse.md#price)*
 
-*Defined in [types.ts:17](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L17)*
+*Defined in [types.ts:34](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L34)*
 
 The price and order data for the quote.
 
@@ -102,7 +102,7 @@ ___
 
 • **side**: *string*
 
-*Defined in [types.ts:45](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L45)*
+*Defined in [types.ts:62](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L62)*
 
 The side of the quote (bid or ask).
 
@@ -114,6 +114,18 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[size](dealerresponse.md#size)*
 
-*Defined in [types.ts:20](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L20)*
+*Defined in [types.ts:37](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L37)*
 
 The taker size, specified in the initial request.
+
+___
+
+###  takerAddress
+
+• **takerAddress**: *string*
+
+*Inherited from [DealerResponse](dealerresponse.md).[takerAddress](dealerresponse.md#takeraddress)*
+
+*Defined in [types.ts:22](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L22)*
+
+The taker address which must fill the order (no other taker will be accepted).

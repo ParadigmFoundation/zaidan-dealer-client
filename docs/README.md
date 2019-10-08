@@ -2,7 +2,6 @@
 
 # Zaidan dealer client
 
-
 _This repository is a mirror for the public client package from the Zaidan monorepo._
 
 # Zaidan dealer client
