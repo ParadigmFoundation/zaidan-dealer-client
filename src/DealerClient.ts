@@ -161,9 +161,9 @@ export class DealerClient {
    * @param takerAddress specify the taker address to check status for.
    * @returns `true` if the specified taker will be allowed to trade with the dealer.
    */
-  public async isAllowed(takerAddress: string = this.coinbase): Promise<boolean> {
-    const { allowed } = await this._call("allowed", "GET", { takerAddress });
-    return allowed;
+  public async isAuthorized(takerAddress: string = this.coinbase): Promise<boolean> {
+    const { authorized } = await this._call("authorized", "GET", { takerAddress });
+    return authorized;
   }
 
   /**
