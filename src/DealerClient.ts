@@ -97,7 +97,7 @@ export class DealerClient {
    * @param web3Uri optional Ethereum JSONRPC url for server-side usage
    * @param txPriority optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"
    */
-  constructor(dealerUri: string, options: DealerOptions) {
+  constructor(dealerUri: string, options: DealerOptions = {}) {
     const { takerAddress, providerUrl, txPriority = "fast" } = options;
     this.initialized = false;
 
