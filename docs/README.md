@@ -2,8 +2,6 @@
 
 # Zaidan dealer client
 
-_This repository is a mirror for the public client package from the Zaidan monorepo._
-
 # Zaidan dealer client
 
 A simple browser client for the Zaidan dealer system, leveraging 0x and ZEIP-18 based fills.
@@ -50,7 +48,9 @@ Pass the `DealerClient` constructor a full URL to a Zaidan dealer RPC server.
 ## Server-side (unlocked node)
 ```typescript
 (async () => {
-  const dealer = new DealerClient("https://dealer.zaidan.io/", "http://localhost:8545");
+  const dealer = new DealerClient("https://dealer.zaidan.io/", {
+    providerUrl: "http://localhost:8545",
+  });
 
   // must be initialized before use, will prompt user to connect wallet
   await dealer.init();
