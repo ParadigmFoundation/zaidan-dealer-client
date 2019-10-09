@@ -17,6 +17,7 @@ import {
   QuoteResponse,
   SwapResponse,
 } from ".";
+import { DealerOptions } from "./types";
 
 /**
  * A simple client for the Zaidan dealer server.
@@ -24,6 +25,9 @@ import {
 export class DealerClient {
   /** 2^256 - 1 represents an effectively "unlimited" allowance */
   public static MAX_ALLOWANCE = new BigNumber(2).exponentiatedBy(256).minus(1);
+
+  /** The dealer API version this client is compatible with. */
+  public static COMPATIBLE_VERSION = "2.0";
 
   /** Dealer server RPC server URL. */
   private readonly dealerUrl: URL;
@@ -93,7 +97,8 @@ export class DealerClient {
    * @param web3Uri optional Ethereum JSONRPC url for server-side usage
    * @param txPriority optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"
    */
-  constructor(dealerUri: string, web3Uri?: string, txPriority: GasPriority = "fast") {
+  constructor(dealerUri: string, options: DealerOptions) {
+    const { takerAddress, providerUrl, txPriority = "fast" } = options;
     this.initialized = false;
 
     this.web3 = null;
@@ -101,16 +106,16 @@ export class DealerClient {
     this.provider = null;
 
     this.networkId = null;
-    this.coinbase = null;
+    this.coinbase = takerAddress || null;
 
     this.txPriority = txPriority;
     this.contractWrappers = null;
 
     this.dealerUrl = new URL(dealerUri);
-    this.apiBase = `${this.dealerUrl.href}api/v1.0`;
+    this.apiBase = `${this.dealerUrl.href}api/v${DealerClient.COMPATIBLE_VERSION}`;
 
-    if (web3Uri) {
-      this.web3Url = new URL(web3Uri);
+    if (providerUrl) {
+      this.web3Url = new URL(providerUrl);
     }
   }
 
@@ -142,13 +147,26 @@ export class DealerClient {
       },
     );
 
-    this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
-    this.coinbase = await this.web3.eth.getCoinbase();
+    // set coinbase if not already set as configuration option
+    this.coinbase = this.coinbase || await this.web3.eth.getCoinbase();
 
+    this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
     this.GAS_PRICE = await getGasPrice(this.txPriority);
     this.pairs = await this._loadMarkets();
     this.tokens = await this._loadAssets();
     this.initialized = true;
+  }
+
+  /**
+   * Check if a taker's address will be allowed to trade with the dealer based
+   * on the dealer's configured whitelist/blacklist.
+   *
+   * @param takerAddress specify the taker address to check status for.
+   * @returns `true` if the specified taker will be allowed to trade with the dealer.
+   */
+  public async isAuthorized(takerAddress: string = this.coinbase): Promise<boolean> {
+    const { authorized } = await this._call("authorized", "GET", { address: takerAddress });
+    return authorized;
   }
 
   /**
@@ -163,6 +181,7 @@ export class DealerClient {
    * @param size the amount of tokens the user is selling/buying (in units of base asset)
    * @param symbol the token pair the swap is for (ex: "WETH/DAI")
    * @param side either 'bid' or 'ask' depending on desired quote side
+   * @param takerAddress optionally override the default (must be able to sign)
    * @returns a price quote and signed maker order from the dealer server
    *
    * @example
@@ -180,13 +199,18 @@ export class DealerClient {
    * }
    * ```
    */
-  public async getQuote(size: number, symbol: string, side: string): Promise<QuoteResponse> {
+  public async getQuote(
+    size: number,
+    symbol: string,
+    side: string,
+    takerAddress: string = this.coinbase,
+  ): Promise<QuoteResponse> {
     assert(this.initialized, "not initialized (call .init() first)");
     assert(side === "bid" || side === "ask", 'side must be "bid" or "ask"');
     assert(this.pairs.includes(symbol), "unsupported token pair (see .pairs)");
     assert(typeof size === "number", "size must be a number");
 
-    const response = await this._call("quote", "GET", { size, symbol, side });
+    const response = await this._call("quote", "GET", { size, symbol, side, takerAddress });
     return response;
   }
 
@@ -222,6 +246,7 @@ export class DealerClient {
     size: number,
     clientAsset: string,
     dealerAsset: string,
+    takerAddress: string = this.coinbase,
   ): Promise<SwapResponse> {
     assert(this.initialized, "not initialized (call .init() first)");
     assert(typeof size === "number", "size must be a number");
@@ -232,7 +257,7 @@ export class DealerClient {
       "configured dealer unable to server requested market",
     );
 
-    const response = await this._call("swap", "GET", { size, dealerAsset, clientAsset });
+    const response = await this._call("swap", "GET", { size, dealerAsset, clientAsset, takerAddress });
     return response;
   }
 

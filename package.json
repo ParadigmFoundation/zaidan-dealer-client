@@ -16,7 +16,6 @@
     "start:snapshot": "docker run -d --rm -p 8545:8545 --name zrx ${npm_package_config_image}",
     "stop:snapshot": "docker kill zrx",
     "dev": "webpack-dev-server",
-    "prepublishOnly": "webpack",
     "docs": "typedoc ./src",
     "docs:dev": "vuepress dev docs",
     "docs:build": "yarn docs && vuepress build docs"

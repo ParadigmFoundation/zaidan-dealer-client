@@ -2,7 +2,6 @@
 
 # Zaidan dealer client
 
-
 ## Index
 
 ### Classes
@@ -12,6 +11,7 @@
 ### Interfaces
 
 * [DealerFillTransaction](interfaces/dealerfilltransaction.md)
+* [DealerOptions](interfaces/dealeroptions.md)
 * [DealerResponse](interfaces/dealerresponse.md)
 * [QuoteResponse](interfaces/quoteresponse.md)
 * [SwapResponse](interfaces/swapresponse.md)
@@ -32,7 +32,7 @@
 
 Ƭ **GasPriority**: *"safeLow" | "standard" | "fast" | "fastest"*
 
-*Defined in [types.ts:74](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/types.ts#L74)*
+*Defined in [types.ts:91](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/types.ts#L91)*
 
 Gas price priority (as used in ETH Gas Station API).
 
@@ -42,7 +42,7 @@ Gas price priority (as used in ETH Gas Station API).
 
 ▸ **convertZeroExTransactionToDealerFill**(`fillTx`: SignedZeroExTransaction, `quoteId`: string): *[DealerFillTransaction](interfaces/dealerfilltransaction.md)*
 
-*Defined in [utils.ts:55](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/utils.ts#L55)*
+*Defined in [utils.ts:55](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/utils.ts#L55)*
 
 Create a dealer POST /order request body from a signed 0x fill transaction and
 the quote ID corresponding to the signed transaction data.
@@ -64,7 +64,7 @@ ___
 
 ▸ **createAndSignZeroExTransaction**(`provider`: SupportedProvider, `signerAddress`: string, `verifyingContractAddress`: string, `order`: SignedOrder, `takerAmount`: BigNumber): *Promise‹SignedZeroExTransaction›*
 
-*Defined in [utils.ts:27](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/utils.ts#L27)*
+*Defined in [utils.ts:27](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/utils.ts#L27)*
 
 Given a signed 0x order, signer address, and taker asset amount, prepare and
 sign a 0x fill transaction to be submitted to the verifying exchange contract
@@ -93,7 +93,7 @@ ___
 
 ▸ **getGasPrice**(`priority`: [GasPriority](globals.md#gaspriority)): *Promise‹BigNumber›*
 
-*Defined in [utils.ts:67](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/df02572/src/utils.ts#L67)*
+*Defined in [utils.ts:67](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/5dcfd78/src/utils.ts#L67)*
 
 Fetch a gas price from Etherchain.org for a given priority (tx conf speed).
 

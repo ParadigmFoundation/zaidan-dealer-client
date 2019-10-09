@@ -1,9 +1,26 @@
 import { SignedOrder } from "@0x/types";
 
 /**
+ * Configuration options for the dealer client.
+ */
+export interface DealerOptions {
+    /** Address to use to sign and fill orders. */
+    takerAddress?: string;
+
+    /** Ethereum JSONRPC provider url (server-side only) */
+    providerUrl?: string;
+
+    /** Optional gas price selector (fast, safeLow, etc.) */
+    txPriority?: GasPriority;
+}
+
+/**
  * The base dealer response, fields present for all quotes (swap/bid/ask).
  */
 export interface DealerResponse {
+    /** The taker address which must fill the order (no other taker will be accepted). */
+    takerAddress: string;
+
     /** The UNIX timestamp at which this offer expires. */
     expiration: number;
 
