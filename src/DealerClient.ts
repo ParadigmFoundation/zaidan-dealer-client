@@ -17,7 +17,7 @@ import {
   QuoteResponse,
   SwapResponse,
 } from ".";
-import { DealerOptions, AuthorizationInfo } from "./types";
+import { AuthorizationInfo, DealerOptions } from "./types";
 
 /**
  * A simple client for the Zaidan dealer server.
