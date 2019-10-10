@@ -17,7 +17,7 @@ import {
   QuoteResponse,
   SwapResponse,
 } from ".";
-import { DealerOptions } from "./types";
+import { AuthorizationInfo, DealerOptions } from "./types";
 
 /**
  * A simple client for the Zaidan dealer server.
@@ -162,11 +162,11 @@ export class DealerClient {
    * on the dealer's configured whitelist/blacklist.
    *
    * @param takerAddress specify the taker address to check status for.
-   * @returns `true` if the specified taker will be allowed to trade with the dealer.
+   * @returns information about taker's authorization status (see [AuthorizationInfo]).
    */
-  public async isAuthorized(takerAddress: string = this.coinbase): Promise<boolean> {
-    const { authorized } = await this._call("authorized", "GET", { address: takerAddress });
-    return authorized;
+  public async getAuthorizationStatus(takerAddress: string = this.coinbase): Promise<AuthorizationInfo> {
+    const { authorized, reason } = await this._call("authorized", "GET", { address: takerAddress });
+    return { authorized, reason };
   }
 
   /**
