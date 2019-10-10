@@ -89,3 +89,16 @@ export interface DealerFillTransaction {
  * Gas price priority (as used in ETH Gas Station API).
  */
 export type GasPriority = "safeLow" | "standard" | "fast" | "fastest";
+
+/**
+ * Possible reasons for a given boolean authorization status.
+ */
+export type AuthorizationReason = "NOT_WHITELISTED" | "BLACKLISTED" | "WHITELISTED" | "NOT_BLACKLISTED" | "IN_WAITLIST";
+
+/**
+ * Information about a taker's authorization status.
+ */
+export interface AuthorizationInfo {
+    authorized: boolean;
+    reason: AuthorizationReason;
+}
