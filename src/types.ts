@@ -19,28 +19,31 @@ export interface DealerOptions {
  */
 export interface DealerResponse {
     /** The taker address which must fill the order (no other taker will be accepted). */
-    takerAddress: string;
+    takerAddress?: string;
 
     /** The UNIX timestamp at which this offer expires. */
-    expiration: number;
+    expiration?: number;
 
     /** The market symbol the quote is for */
-    pair: string;
+    pair?: string;
 
     /** The unique request ID that refers to this offer. */
-    id: string;
+    id?: string;
 
     /** The price and order data for the quote. */
-    price: number;
+    price?: number;
 
     /** The taker size, specified in the initial request. */
-    size: number;
+    size?: number;
 
     /** The required fee from the dealer server. */
-    fee: number;
+    fee?: number;
 
     /** The signed maker order from the dealer server. */
-    order: SignedOrder;
+    order?: SignedOrder;
+
+    /** If present, indicates a request failure, and no other fields will be present. */
+    error?: string;
 }
 
 /**
@@ -48,10 +51,10 @@ export interface DealerResponse {
  */
 export interface SwapResponse extends DealerResponse {
     /** The asset (ticker) the dealer will send to the client. */
-    dealerAsset: string;
+    dealerAsset?: string;
 
     /** The asset (ticker) the client will send to the dealer. */
-    clientAsset: string;
+    clientAsset?: string;
 }
 
 /**
@@ -59,7 +62,7 @@ export interface SwapResponse extends DealerResponse {
  */
 export interface QuoteResponse extends DealerResponse {
     /** The side of the quote (bid or ask). */
-    side: string;
+    side?: string;
 }
 
 /**

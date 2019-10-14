@@ -266,7 +266,7 @@ export class DealerClient {
     if (code === 200) {
       return data;
     } else if (code === 400) {
-      throw new Error(data.error);
+      return { error: data.error };
     }
   }
 
