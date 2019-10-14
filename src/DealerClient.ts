@@ -211,10 +211,10 @@ export class DealerClient {
     assert(this.pairs.includes(symbol), "unsupported token pair (see .pairs)");
     assert(typeof size === "number", "size must be a number");
 
-    const { code, data } = await this._call("quote", "GET", { size, symbol, side, takerAddress });
-    if (code === 200) {
+    const { status, data } = await this._call("quote", "GET", { size, symbol, side, takerAddress });
+    if (status === 200) {
       return data;
-    } else if (code === 400) {
+    } else if (status === 400) {
       throw new Error(data.error);
     }
   }
@@ -262,10 +262,10 @@ export class DealerClient {
       "configured dealer unable to server requested market",
     );
 
-    const { data, code } = await this._call("swap", "GET", { size, dealerAsset, clientAsset, takerAddress });
-    if (code === 200) {
+    const { data, status } = await this._call("swap", "GET", { size, dealerAsset, clientAsset, takerAddress });
+    if (status === 200) {
       return data;
-    } else if (code === 400) {
+    } else if (status === 400) {
       return { error: data.error };
     }
   }
@@ -317,10 +317,10 @@ export class DealerClient {
 
     try {
       const req = convertZeroExTransactionToDealerFill(signedFillTx, quoteId);
-      const { data, code } = await this._call("order", "POST", req);
-      if (code === 200) {
+      const { data, status } = await this._call("order", "POST", req);
+      if (status === 200) {
         return data.txId;
-      } else if (code === 400) {
+      } else if (status === 400) {
         throw new Error(data.error);
       }
     } catch (error) {
