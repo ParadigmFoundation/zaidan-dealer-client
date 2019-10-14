@@ -5,7 +5,7 @@ import { BigNumber } from "@0x/utils";
 import { Web3Wrapper } from "@0x/web3-wrapper";
 import { ERC20Token } from "@habsyr/erc20-token";
 import assert from "assert";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Provider, SupportedProvider, TransactionReceiptWithDecodedLogs } from "ethereum-types";
 import Web3 from "web3";
 
@@ -165,7 +165,8 @@ export class DealerClient {
    * @returns information about taker's authorization status (see [AuthorizationInfo]).
    */
   public async getAuthorizationStatus(takerAddress: string = this.coinbase): Promise<AuthorizationInfo> {
-    const { authorized, reason } = await this._call("authorized", "GET", { address: takerAddress });
+    const { data } = await this._call("authorized", "GET", { address: takerAddress });
+    const { authorized, reason } = data;
     return { authorized, reason };
   }
 
@@ -308,8 +309,12 @@ export class DealerClient {
 
     try {
       const req = convertZeroExTransactionToDealerFill(signedFillTx, quoteId);
-      const { txId } = await this._call("order", "POST", req);
-      return txId;
+      const { data, code } = await this._call("order", "POST", req);
+      if (code === 200) {
+        return data.txId;
+      } else if (code === 400) {
+        throw new Error(data.error);
+      }
     } catch (error) {
       throw new Error(`failed to submit trade: ${error.message}`);
     }
@@ -522,8 +527,8 @@ export class DealerClient {
     }
   }
 
-  private async _callAny(url: string, method: "GET" | "POST", data?: any): Promise<any> {
-    const response = await axios(
+  private async _callAny(url: string, method: "GET" | "POST", data?: any): Promise<AxiosResponse<any>> {
+    return axios(
       url,
       {
         method,
@@ -532,9 +537,11 @@ export class DealerClient {
         },
         params: method === "GET" && data ? data : null,
         data: method === "POST" ? data : null,
+        validateStatus(status: number): boolean {
+          return (status >= 200 && status < 300) || status === 400;
+        },
       },
     );
-    return response.data;
   }
 
   private async _call(endpoint: string, method: "GET" | "POST", data?: any): Promise<any> {
@@ -548,10 +555,12 @@ export class DealerClient {
   }
 
   private async _loadMarkets(): Promise<string[]> {
-    return this._call("markets", "GET");
+    const { data } = await this._call("markets", "GET");
+    return data;
   }
 
   private async _loadAssets(): Promise<any> {
-    return this._call("assets", "GET");
+    const { data } = await this._call("assets", "GET");
+    return data;
   }
 }
