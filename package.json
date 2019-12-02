@@ -1,6 +1,6 @@
 {
   "name": "zaidan-dealer-client",
-  "version": "0.7.0-beta.2",
+  "version": "0.7.0-beta.3",
   "main": "dist/index.js",
   "repository": "https://github.com/ParadigmFoundation/zaidan-dealer-client",
   "license": "MIT",
