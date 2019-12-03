@@ -236,10 +236,10 @@ export class DealerClient {
    * @example
    * ```javascript
    * // fetch a quote to swap 100 DAI for WETH
-   * const { order, id } = await dealer.getSwapQuote(100, "DAI", "WETH");
+   * const quote = await dealer.getSwapQuote(100, "DAI", "WETH");
    *
    * // request for the trade to be filled
-   * const txId = await dealer.handleTrade(order, id);
+   * const txId = await dealer.handleTrade(quote);
    * ```
    */
   public async getSwapQuote(
@@ -275,12 +275,13 @@ export class DealerClient {
    * @example
    * ```javascript
    * // load a signed order from a quote
-   * const dealerRes = await dealer.getQuote(10, "WETH/DAI", "bid");
-   * const order = dealerRes.order;
-   * const id = dealerRes.id;
+   * const quote = await dealer.getQuote(10, "WETH/DAI", "bid");
+   *
+   * // many fields available in the quote
+   * const { order, id, price, size } = quote;
    *
    * // submit the trade for settlement
-   * const txId = await dealer.handleTrade(order, id);
+   * const txId = await dealer.handleTrade(quote);
    *
    * // get a link to the transaction on Etherscan
    * const link = dealer.getEtherscanLink(txId);
