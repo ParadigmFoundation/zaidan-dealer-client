@@ -1,4 +1,5 @@
 import { SignedOrder } from "@0x/types";
+import { Provider } from "ethereum-types";
 
 /**
  * Configuration options for the dealer client.
@@ -12,6 +13,9 @@ export interface DealerOptions {
 
     /** Optional gas price selector (fast, safeLow, etc.) */
     txPriority?: GasPriority;
+
+    /** Optional prepared ethereum provider */
+    provider?: Provider;
 }
 
 /**
