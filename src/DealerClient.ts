@@ -94,8 +94,7 @@ export class DealerClient {
    * setting of attempting to load a web3 provider through the browser.
    *
    * @param dealerUri the base RPC API path for the dealer server
-   * @param web3Uri optional Ethereum JSONRPC url for server-side usage
-   * @param txPriority optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"
+   * @param options optional configuration to allow non standard usages of the class
    */
   constructor(dealerUri: string, options: DealerOptions = {}) {
     const { takerAddress, providerUrl, txPriority = "fast", provider } = options;
