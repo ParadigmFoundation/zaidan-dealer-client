@@ -98,12 +98,12 @@ export class DealerClient {
    * @param txPriority optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"
    */
   constructor(dealerUri: string, options: DealerOptions = {}) {
-    const { takerAddress, providerUrl, txPriority = "fast" } = options;
+    const { takerAddress, providerUrl, txPriority = "fast", provider } = options;
     this.initialized = false;
 
     this.web3 = null;
     this.web3Wrapper = null;
-    this.provider = null;
+    this.provider = provider || null;
 
     this.networkId = null;
     this.coinbase = takerAddress || null;
@@ -128,14 +128,18 @@ export class DealerClient {
    * @returns A promise that resolves when initialization is complete.
    */
   public async init(): Promise<void> {
-    if (this.web3Url) {
-      this.isBrowser = false;
-      this.web3 = new Web3(this.web3Url.href);
-      this.provider = this.web3.currentProvider;
+    if (!this.provider) {
+      if (this.web3Url) {
+        this.isBrowser = false;
+        this.web3 = new Web3(this.web3Url.href);
+        this.provider = this.web3.currentProvider;
+      } else {
+        await this._connectMetamask();
+        this.isBrowser = true;
+        this.provider = new MetamaskSubprovider((window as any).ethereum);
+      }
     } else {
-      await this._connectMetamask();
-      this.isBrowser = true;
-      this.provider = new MetamaskSubprovider((window as any).ethereum);
+      this.web3 = new Web3(this.provider as any);
     }
 
     this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
