@@ -1,5 +1,4 @@
 import { SignedOrder } from "@0x/types";
-import { Provider } from "ethereum-types";
 
 /**
  * Configuration options for the dealer client.
@@ -8,14 +7,8 @@ export interface DealerOptions {
     /** Address to use to sign and fill orders. */
     takerAddress?: string;
 
-    /** Ethereum JSONRPC provider url (server-side only) */
-    providerUrl?: string;
-
     /** Optional gas price selector (fast, safeLow, etc.) */
     txPriority?: GasPriority;
-
-    /** Optional prepared ethereum provider */
-    provider?: Provider;
 }
 
 /**
