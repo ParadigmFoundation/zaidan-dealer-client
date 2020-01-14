@@ -7,7 +7,7 @@ import { ERC20Token } from "@habsyr/erc20-token";
 import assert from "assert";
 import axios from "axios";
 import { Provider, SupportedProvider, TransactionReceiptWithDecodedLogs } from "ethereum-types";
-import Web3 from "web3";
+import { fromWei, toWei } from "web3-utils";
 
 import {
   convertZeroExTransactionToDealerFill,
@@ -32,9 +32,6 @@ export class DealerClient {
   /** Dealer server RPC server URL. */
   private readonly dealerUrl: URL;
 
-  /** Stores the Ethereum JSONRPC provider URL for server-side usage. */
-  private readonly web3Url: URL;
-
   /** Base API path for the dealer server. */
   private readonly apiBase: string;
 
@@ -51,10 +48,7 @@ export class DealerClient {
    */
   public tokens: { [ticker: string]: string };
 
-  /** Main Web3 instance for interacting with Ethereum. */
-  public web3: Web3;
-
-  /** Provides additional convenience methods for interacting with web3. */
+  /** Provides convenience methods for interacting with Ethereum. */
   public web3Wrapper: Web3Wrapper;
 
   /** Provider instance used to interact with Ethereum. */
@@ -71,9 +65,6 @@ export class DealerClient {
 
   /** Set to 'true' after a successful .init(), must be called before use. */
   public initialized: boolean;
-
-  /** Set to 'true' if browser environment is detected. */
-  public isBrowser: boolean;
 
   /** Default gas price to use for allowance transactions (in wei). */
   public GAS_PRICE: BigNumber;
@@ -94,16 +85,15 @@ export class DealerClient {
    * setting of attempting to load a web3 provider through the browser.
    *
    * @param dealerUri the base RPC API path for the dealer server
-   * @param web3Uri optional Ethereum JSONRPC url for server-side usage
-   * @param txPriority optionally set the gas price (via etherchain) as "fast", "average", or "safeLow"
+   * @param provider an ethereum provider
+   * @param options optional configuration to allow non standard usages of the class
    */
-  constructor(dealerUri: string, options: DealerOptions = {}) {
-    const { takerAddress, providerUrl, txPriority = "fast" } = options;
+  constructor(dealerUri: string, provider: Provider, options: DealerOptions = {}) {
+    const { takerAddress, txPriority = "fast" } = options;
     this.initialized = false;
 
-    this.web3 = null;
-    this.web3Wrapper = null;
-    this.provider = null;
+    this.provider = provider;
+    this.web3Wrapper = new Web3Wrapper(this.provider);
 
     this.networkId = null;
     this.coinbase = takerAddress || null;
@@ -113,10 +103,6 @@ export class DealerClient {
 
     this.dealerUrl = new URL(dealerUri);
     this.apiBase = `${this.dealerUrl.href}api/v${DealerClient.COMPATIBLE_VERSION}`;
-
-    if (providerUrl) {
-      this.web3Url = new URL(providerUrl);
-    }
   }
 
   /**
@@ -128,27 +114,16 @@ export class DealerClient {
    * @returns A promise that resolves when initialization is complete.
    */
   public async init(): Promise<void> {
-    if (this.web3Url) {
-      this.isBrowser = false;
-      this.web3 = new Web3(this.web3Url.href);
-      this.provider = this.web3.currentProvider;
-    } else {
-      await this._connectMetamask();
-      this.isBrowser = true;
-      this.provider = new MetamaskSubprovider((window as any).ethereum);
-    }
-
-    this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
     this.networkId = await this.web3Wrapper.getNetworkIdAsync();
     this.contractWrappers = new ContractWrappers(
-      this.web3.currentProvider,
+      this.provider,
       {
         networkId: this.networkId,
       },
     );
 
     // set coinbase if not already set as configuration option
-    this.coinbase = this.coinbase || await this.web3.eth.getCoinbase();
+    this.coinbase = this.coinbase || await this.web3Wrapper.getAvailableAddressesAsync().then(addresses => addresses[0]);
 
     this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
     this.GAS_PRICE = await getGasPrice(this.txPriority);
@@ -444,7 +419,7 @@ export class DealerClient {
    */
   public fromWei(weiAmount: string): string {
     assert(typeof weiAmount === "string", "pass amounts as strings to avoid precision errors");
-    return this.web3.utils.fromWei(weiAmount);
+    return fromWei(weiAmount);
   }
 
   /**
@@ -465,7 +440,7 @@ export class DealerClient {
    */
   public toWei(etherAmount: string): string {
     assert(typeof etherAmount === "string", "pass amounts as strings to avoid precision errors");
-    return this.web3.utils.toWei(etherAmount);
+    return toWei(etherAmount);
   }
 
   /**
@@ -501,25 +476,6 @@ export class DealerClient {
    */
   public supportedTickers(): string[] {
     return Object.keys(this.tokens);
-  }
-
-  private async _connectMetamask(): Promise<void> {
-    assert(window, "not in browser environment");
-    const { web3, ethereum } = (window as any);
-    assert(web3 || ethereum, "unsupported browser (must be a web3 browser)");
-
-    if (ethereum) {
-      try {
-        await ethereum.enable();
-        this.web3 = new Web3(ethereum);
-      } catch (error) {
-        throw new Error("user denied site access");
-      }
-      Object.defineProperty(global, "web3", this.web3);
-    } else {
-      this.web3 = new Web3(web3.currentProvider);
-      Object.defineProperty(window, "web3", this.web3);
-    }
   }
 
   private async _callAny(url: string, method: "GET" | "POST", data?: any): Promise<any> {
