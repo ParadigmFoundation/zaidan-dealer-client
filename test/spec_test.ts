@@ -3,7 +3,6 @@ import { ContractWrappers } from "@0x/contract-wrappers";
 import { BigNumber } from "@0x/utils";
 import assert from "assert";
 import { Server } from "http";
-import Redis from "ioredis";
 import Web3 from "web3";
 
 import { DealerClient } from "../src/DealerClient";
