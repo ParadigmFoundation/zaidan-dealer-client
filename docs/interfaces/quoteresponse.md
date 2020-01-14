@@ -16,6 +16,7 @@ The dealer's response for a currency pair quote (bid/ask on X/Y pair).
 
 * [expiration](quoteresponse.md#expiration)
 * [fee](quoteresponse.md#fee)
+* [gasPrice](quoteresponse.md#gasprice)
 * [id](quoteresponse.md#id)
 * [order](quoteresponse.md#order)
 * [pair](quoteresponse.md#pair)
@@ -32,7 +33,7 @@ The dealer's response for a currency pair quote (bid/ask on X/Y pair).
 
 *Inherited from [DealerResponse](dealerresponse.md).[expiration](dealerresponse.md#expiration)*
 
-*Defined in [types.ts:25](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L25)*
+*Defined in [types.ts:25](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L25)*
 
 The UNIX timestamp at which this offer expires.
 
@@ -44,9 +45,21 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[fee](dealerresponse.md#fee)*
 
-*Defined in [types.ts:40](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L40)*
+*Defined in [types.ts:40](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L40)*
 
 The required fee from the dealer server.
+
+___
+
+###  gasPrice
+
+• **gasPrice**: *string*
+
+*Inherited from [DealerResponse](dealerresponse.md).[gasPrice](dealerresponse.md#gasprice)*
+
+*Defined in [types.ts:46](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L46)*
+
+The gas price the dealer will use to submit the fill (incl. in 0x transaction message).
 
 ___
 
@@ -56,7 +69,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[id](dealerresponse.md#id)*
 
-*Defined in [types.ts:31](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L31)*
+*Defined in [types.ts:31](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L31)*
 
 The unique request ID that refers to this offer.
 
@@ -68,7 +81,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[order](dealerresponse.md#order)*
 
-*Defined in [types.ts:43](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L43)*
+*Defined in [types.ts:43](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L43)*
 
 The signed maker order from the dealer server.
 
@@ -80,7 +93,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[pair](dealerresponse.md#pair)*
 
-*Defined in [types.ts:28](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L28)*
+*Defined in [types.ts:28](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L28)*
 
 The market symbol the quote is for
 
@@ -92,7 +105,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[price](dealerresponse.md#price)*
 
-*Defined in [types.ts:34](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L34)*
+*Defined in [types.ts:34](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L34)*
 
 The price and order data for the quote.
 
@@ -102,7 +115,7 @@ ___
 
 • **side**: *string*
 
-*Defined in [types.ts:62](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L62)*
+*Defined in [types.ts:65](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L65)*
 
 The side of the quote (bid or ask).
 
@@ -114,7 +127,7 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[size](dealerresponse.md#size)*
 
-*Defined in [types.ts:37](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L37)*
+*Defined in [types.ts:37](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L37)*
 
 The taker size, specified in the initial request.
 
@@ -126,6 +139,6 @@ ___
 
 *Inherited from [DealerResponse](dealerresponse.md).[takerAddress](dealerresponse.md#takeraddress)*
 
-*Defined in [types.ts:22](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L22)*
+*Defined in [types.ts:22](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L22)*
 
 The taker address which must fill the order (no other taker will be accepted).

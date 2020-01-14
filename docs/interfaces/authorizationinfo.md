@@ -21,7 +21,7 @@ Information about a taker's authorization status.
 
 • **authorized**: *boolean*
 
-*Defined in [types.ts:102](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L102)*
+*Defined in [types.ts:108](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L108)*
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 • **reason**: *[AuthorizationReason](../globals.md#authorizationreason)*
 
-*Defined in [types.ts:103](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L103)*
+*Defined in [types.ts:109](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L109)*

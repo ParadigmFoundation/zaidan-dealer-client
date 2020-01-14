@@ -38,6 +38,9 @@ export interface DealerResponse {
 
     /** The signed maker order from the dealer server. */
     order: SignedOrder;
+
+    /** The gas price the dealer will use to submit the fill (incl. in 0x transaction message). */
+    gasPrice: string;
 }
 
 /**
@@ -80,6 +83,9 @@ export interface DealerFillTransaction {
 
     /** Required UUID from initial quote (must match signed order). */
     quoteId: string;
+
+    /** Gas price in wei (provided by dealer) used to fill transaction. */
+    gasPrice: string;
 }
 
 /**

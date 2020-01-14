@@ -27,7 +27,7 @@ export class DealerClient {
   public static MAX_ALLOWANCE = new BigNumber(2).exponentiatedBy(256).minus(1);
 
   /** The dealer API version this client is compatible with. */
-  public static COMPATIBLE_VERSION = "2.0";
+  public static COMPATIBLE_VERSION = "3.0";
 
   /** Dealer server RPC server URL. */
   private readonly dealerUrl: URL;
@@ -118,7 +118,7 @@ export class DealerClient {
     this.contractWrappers = new ContractWrappers(
       this.provider,
       {
-        networkId: this.networkId,
+        chainId: this.networkId,
       },
     );
 
@@ -211,10 +211,10 @@ export class DealerClient {
    * @example
    * ```javascript
    * // fetch a quote to swap 100 DAI for WETH
-   * const { order, id } = await dealer.getSwapQuote(100, "DAI", "WETH");
+   * const quote = await dealer.getSwapQuote(100, "DAI", "WETH");
    *
    * // request for the trade to be filled
-   * const txId = await dealer.handleTrade(order, id);
+   * const txId = await dealer.handleTrade(quote);
    * ```
    */
   public async getSwapQuote(
@@ -250,12 +250,13 @@ export class DealerClient {
    * @example
    * ```javascript
    * // load a signed order from a quote
-   * const dealerRes = await dealer.getQuote(10, "WETH/DAI", "bid");
-   * const order = dealerRes.order;
-   * const id = dealerRes.id;
+   * const quote = await dealer.getQuote(10, "WETH/DAI", "bid");
+   *
+   * // many fields available in the quote
+   * const { order, id, price, size } = quote;
    *
    * // submit the trade for settlement
-   * const txId = await dealer.handleTrade(order, id);
+   * const txId = await dealer.handleTrade(quote);
    *
    * // get a link to the transaction on Etherscan
    * const link = dealer.getEtherscanLink(txId);
@@ -264,8 +265,8 @@ export class DealerClient {
    * await dealer.waitForTransactionSuccessOrThrow(txId);
    * ```
    */
-  public async handleTrade(order: SignedOrder, quoteId: string, takerAddress: string = this.coinbase): Promise<string> {
-    const takerAmount = new BigNumber(order.takerAssetAmount);
+  public async handleTrade(quote: SwapResponse | QuoteResponse, takerAddress: string = this.coinbase): Promise<string> {
+    const takerAmount = new BigNumber(quote.order.takerAssetAmount);
     const verifyingContractAddress = this.contractWrappers.exchange.address;
 
     let signedFillTx: SignedZeroExTransaction;
@@ -274,15 +275,16 @@ export class DealerClient {
         this.provider,
         takerAddress,
         verifyingContractAddress,
-        order,
+        quote.order,
         takerAmount,
+        new BigNumber(quote.gasPrice),
       );
     } catch (error) {
       throw new Error(`failed to sign fill transaction: ${error.message}`);
     }
 
     try {
-      const req = convertZeroExTransactionToDealerFill(signedFillTx, quoteId);
+      const req = await convertZeroExTransactionToDealerFill(this.provider, quote.order.chainId, signedFillTx, quote.id);
       const { txId } = await this._call("order", "POST", req);
       return txId;
     } catch (error) {
@@ -313,9 +315,9 @@ export class DealerClient {
     const tokenAddress = this._getAddress(tokenTicker);
     const allowance = await this.erc20Token.getProxyAllowanceAsync(tokenAddress, this.coinbase);
 
-    // (2**256 - 1)/2 represents a remaining wei allowance for which a greater remaining
-    // amount indicates the user set an "unlimited" allowance at one point
-    if (allowance.isGreaterThan(DealerClient.MAX_ALLOWANCE.div(2))) {
+    // 2**255 represents a remaining wei allowance for which a greater remaining
+    // amount indicates the user most likely set an "unlimited" allowance at one point
+    if (allowance.isGreaterThan(new BigNumber(2).exponentiatedBy(255) as any)) {
       return true;
     } else {
       return false;
@@ -334,7 +336,7 @@ export class DealerClient {
    * @example
    * ```javascript
    * try {
-   *   // can take a long time, resolves after tx is mined
+   *   // can take a long time (~1 min), resolves after tx is mined
    *   await client.setAllowance("DAI");
    *
    *   console.log("failed to set allowance");
@@ -347,7 +349,7 @@ export class DealerClient {
     const tokenAddress = this._getAddress(tokenTicker);
     const from = this.coinbase;
     const gasPrice = this.GAS_PRICE;
-    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(tokenAddress, { from, gasPrice });
+    const txId = await this.erc20Token.setUnlimitedProxyAllowanceAsync(tokenAddress, { from, gasPrice: gasPrice as any });
     return this.web3Wrapper.awaitTransactionSuccessAsync(txId);
   }
 

@@ -20,6 +20,8 @@ const {
     DUMMY_TOKEN_B_ADDRESS = "0x25b8fe1de9daf8ba351890744ff28cf7dfa8f5e3",
 } = process.env;
 
+const expiration = 1900000000;
+
 class MockDealer {
     public initialized: boolean;
     private readonly initializing: Promise<void>;
@@ -42,11 +44,11 @@ class MockDealer {
 
     public async init(url: string): Promise<void> {
         this.web3 = new Web3(url);
-        this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
+        this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider as any);
 
         const networkId = await this.web3.eth.net.getId();
 
-        this.zeroExContracts = new ContractWrappers(this.web3.currentProvider, { networkId });
+        this.zeroExContracts = new ContractWrappers(this.web3.currentProvider as any, { chainId: networkId });
         this.EXCHANGE_ADDRESS = this.zeroExContracts.exchange.address;
         this.initialized = true;
     }
@@ -58,8 +60,6 @@ class MockDealer {
 
         const sizeStr = size.toString();
 
-        const expiration = Math.floor(Date.now() / 1000) + 20;
-
         const mock = {
             pair: "TKA/TKB",
             side,
@@ -70,6 +70,7 @@ class MockDealer {
             price: 0.2,
             order: await this.generateOrder(sizeStr, takerAmount, this.tokenA, this.tokenB, expiration),
             takerAddress,
+            gasPrice: "1",
         };
         return mock;
     }
@@ -79,15 +80,16 @@ class MockDealer {
         takerAmount: string,
         makerToken: string,
         takerToken: string,
-        expiry: number,
+        _: number,
     ): Promise<any> {
         // construct raw order object
         const zeroExOrder = {
+            chainId: 1337,
             makerAddress: this.serverAddress,
             senderAddress: this.NULL_ADDRESS,
             makerAssetAmount: new BigNumber(this.web3.utils.toWei(makerAmount)),
             takerAssetAmount: new BigNumber(this.web3.utils.toWei(takerAmount)),
-            expirationTimeSeconds: new BigNumber(expiry),
+            expirationTimeSeconds: new BigNumber(expiration),
             makerAssetData: assetDataUtils.encodeERC20AssetData(makerToken),
             takerAssetData: assetDataUtils.encodeERC20AssetData(takerToken),
 
@@ -98,27 +100,34 @@ class MockDealer {
             exchangeAddress: this.EXCHANGE_ADDRESS,
             takerAddress: this.NULL_ADDRESS,
             feeRecipientAddress: this.NULL_ADDRESS,
+            makerFeeAssetData: "0x000000000000000000000000000000000000000000000000000000000000000000000000",
+            takerFeeAssetData: "0x000000000000000000000000000000000000000000000000000000000000000000000000",
         };
 
         return signatureUtils.ecSignOrderAsync(
-            this.web3.currentProvider,
+            this.web3.currentProvider as any,
             zeroExOrder,
             this.serverAddress,
         );
     }
 
-    public async fill(salt: string, clientAccount: string, data: string, sig: string): Promise<string> {
-        const receipt = await this.zeroExContracts.exchange.executeTransaction.awaitTransactionSuccessAsync(
-            new BigNumber(salt),
-            clientAccount,
+    public async fill(salt: string, clientAccount: string, data: string, sig: string, gasPrice: any): Promise<string> {
+        const tx = {
+            salt: new BigNumber(salt),
+            expirationTimeSeconds: new BigNumber(expiration),
+            gasPrice: new BigNumber(gasPrice),
+            signerAddress: clientAccount,
             data,
-            sig,
+        };
+        const hash = await this.zeroExContracts.exchange.executeTransaction(tx, sig).sendTransactionAsync(
             {
                 from: this.serverAddress,
-                gas: new BigNumber(4400000),
+                gas: "4400000",
+                value: "100000000",
+                gasPrice: new BigNumber(gasPrice).toString(),
             },
         );
-        return receipt.transactionHash;
+        return hash;
     }
 }
 
@@ -153,9 +162,10 @@ router.post("/order", async (req, res, next) => {
         data,
         sig,
         address,
+        gasPrice,
     } = req.body;
 
-    const txId = await dealer.fill(salt, address, data, sig);
+    const txId = await dealer.fill(salt, address, data, sig, gasPrice);
     res.status(200).send({ txId });
 });
 
@@ -165,4 +175,4 @@ router.get("/markets", async (req, res, next) => {
 });
 
 app.use(bodyParser.json());
-app.use("/api/v2.0", router);
+app.use("/api/v3.0", router);

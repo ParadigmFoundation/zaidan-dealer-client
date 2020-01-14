@@ -75,8 +75,8 @@ describe("Zaidan client unit tests", function (): void {
         networkId = await web3.eth.net.getId();
         accounts = await web3.eth.getAccounts();
 
-        contractWrappers = new ContractWrappers(web3.currentProvider, { networkId });
-        erc20ProxyAddress = contractWrappers.erc20Proxy.address;
+        contractWrappers = new ContractWrappers(web3.currentProvider, { chainId: networkId });
+        erc20ProxyAddress = contractWrappers.contractAddresses.erc20Proxy;
 
         clientAddress = accounts[parseInt(CLIENT_ACCOUNT_INDEX)];
         dealerAddress = accounts[parseInt(DEALER_ACCOUNT_INDEX)];
@@ -92,16 +92,16 @@ describe("Zaidan client unit tests", function (): void {
         tokenA = new DummyERC20TokenContract(tokenAAddress, web3.currentProvider);
         tokenB = new DummyERC20TokenContract(tokenBAddress, web3.currentProvider);
 
-        await tokenA.approve.awaitTransactionSuccessAsync(erc20ProxyAddress, MAX_ALLOWANCE, { from: dealerAddress });
-        await tokenA.approve.awaitTransactionSuccessAsync(erc20ProxyAddress, MAX_ALLOWANCE, { from: dealerAddress });
+        await tokenA.approve(erc20ProxyAddress, MAX_ALLOWANCE).awaitTransactionSuccessAsync({ from: dealerAddress });
+        await tokenB.approve(erc20ProxyAddress, MAX_ALLOWANCE).awaitTransactionSuccessAsync({ from: dealerAddress });
     });
 
     this.beforeAll("mint same number of each token for dealer and client", async function (): Promise<void> {
-        await tokenA.mint.sendTransactionAsync(mintAmount, { from: dealerAddress });
-        await tokenB.mint.sendTransactionAsync(mintAmount, { from: dealerAddress });
+        await tokenA.mint(mintAmount).sendTransactionAsync({ from: dealerAddress });
+        await tokenB.mint(mintAmount).sendTransactionAsync({ from: dealerAddress });
 
-        await tokenA.mint.sendTransactionAsync(mintAmount, { from: clientAddress });
-        await tokenB.mint.sendTransactionAsync(mintAmount, { from: clientAddress });
+        await tokenA.mint(mintAmount).sendTransactionAsync({ from: clientAddress });
+        await tokenB.mint(mintAmount).sendTransactionAsync({ from: clientAddress });
     });
 
     it("should show assets that match expected addresses", function (done: MochaDone): void {
@@ -166,8 +166,8 @@ describe("Zaidan client unit tests", function (): void {
 
     it("should fill a quote without error", async function (): Promise<void> {
         const market = client.pairs[0];
-        const { id, order } = await client.getQuote(1, market, "bid");
-        const txId = await client.handleTrade(order, id);
+        const quote = await client.getQuote(1, market, "bid");
+        const txId = await client.handleTrade(quote, clientAddress);
 
         assert(txId, "there should be a transaction ID");
         assert(/^0x[a-fA-F0-9]{64}$/.test(txId), "the transaction ID should be a valid transaction hash");

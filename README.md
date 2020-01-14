@@ -82,9 +82,9 @@ const { id, order, price } = await dealer.getSwapQuote(3.5, "WETH", "DAI");
 If the client wishes to execute the quote (within the bounds of it's expiration), they can sign the order according to ZEIP-18 and request for the dealer to execute the fill.
 
 ```typescript
-// load `order` and `id` as described above
+// simply pass the full quote object back to `handleTrade` to execute a quote
 // will prompt for signature and request the trade be settled by the dealer
-const txId = await dealer.handleTrade(order, id);
+const txId = await dealer.handleTrade(quote);
 ```
 
 See [the `./docs` folder](./docs) for more.

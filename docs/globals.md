@@ -34,7 +34,7 @@
 
 Ƭ **AuthorizationReason**: *"NOT_WHITELISTED" | "BLACKLISTED" | "WHITELISTED" | "NOT_BLACKLISTED" | "IN_WAITLIST"*
 
-*Defined in [types.ts:96](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L96)*
+*Defined in [types.ts:102](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L102)*
 
 Possible reasons for a given boolean authorization status.
 
@@ -44,7 +44,7 @@ ___
 
 Ƭ **GasPriority**: *"safeLow" | "standard" | "fast" | "fastest"*
 
-*Defined in [types.ts:91](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/types.ts#L91)*
+*Defined in [types.ts:97](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/types.ts#L97)*
 
 Gas price priority (as used in ETH Gas Station API).
 
@@ -52,9 +52,9 @@ Gas price priority (as used in ETH Gas Station API).
 
 ###  convertZeroExTransactionToDealerFill
 
-▸ **convertZeroExTransactionToDealerFill**(`fillTx`: SignedZeroExTransaction, `quoteId`: string): *[DealerFillTransaction](interfaces/dealerfilltransaction.md)*
+▸ **convertZeroExTransactionToDealerFill**(`provider`: SupportedProvider, `chainId`: number, `fillTx`: SignedZeroExTransaction, `quoteId`: string): *Promise‹[DealerFillTransaction](interfaces/dealerfilltransaction.md)›*
 
-*Defined in [utils.ts:55](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/utils.ts#L55)*
+*Defined in [utils.ts:71](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/utils.ts#L71)*
 
 Create a dealer POST /order request body from a signed 0x fill transaction and
 the quote ID corresponding to the signed transaction data.
@@ -63,10 +63,12 @@ the quote ID corresponding to the signed transaction data.
 
 Name | Type | Description |
 ------ | ------ | ------ |
+`provider` | SupportedProvider | A supported Ethereum JSONRPC provider. |
+`chainId` | number | The Ethereum chain ID of the verifying contract. |
 `fillTx` | SignedZeroExTransaction | The taker-signed ZEIP-18 fill transaction. |
 `quoteId` | string | The quote UUID corresponding to the initial quote request. |
 
-**Returns:** *[DealerFillTransaction](interfaces/dealerfilltransaction.md)*
+**Returns:** *Promise‹[DealerFillTransaction](interfaces/dealerfilltransaction.md)›*
 
 The necessary request body to submit the fill to the dealer.
 
@@ -74,9 +76,9 @@ ___
 
 ###  createAndSignZeroExTransaction
 
-▸ **createAndSignZeroExTransaction**(`provider`: SupportedProvider, `signerAddress`: string, `verifyingContractAddress`: string, `order`: SignedOrder, `takerAmount`: BigNumber): *Promise‹SignedZeroExTransaction›*
+▸ **createAndSignZeroExTransaction**(`provider`: SupportedProvider, `signerAddress`: string, `verifyingContractAddress`: string, `order`: SignedOrder, `takerAmount`: BigNumber, `gasPrice`: BigNumber): *Promise‹SignedZeroExTransaction›*
 
-*Defined in [utils.ts:27](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/utils.ts#L27)*
+*Defined in [utils.ts:28](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/utils.ts#L28)*
 
 Given a signed 0x order, signer address, and taker asset amount, prepare and
 sign a 0x fill transaction to be submitted to the verifying exchange contract
@@ -94,6 +96,7 @@ Name | Type | Description |
 `verifyingContractAddress` | string | Usually the 0x exchange contract address for a given network. |
 `order` | SignedOrder | A maker-signed 0x order message to create a fill transaction for. |
 `takerAmount` | BigNumber | The amount of the available `takerAssetAmount` to fill (base units). |
+`gasPrice` | BigNumber | - |
 
 **Returns:** *Promise‹SignedZeroExTransaction›*
 
@@ -105,7 +108,7 @@ ___
 
 ▸ **getGasPrice**(`priority`: [GasPriority](globals.md#gaspriority)): *Promise‹BigNumber›*
 
-*Defined in [utils.ts:67](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/e23c101/src/utils.ts#L67)*
+*Defined in [utils.ts:90](https://github.com/ParadigmFoundation/zaidan-dealer-client/blob/8857c4e/src/utils.ts#L90)*
 
 Fetch a gas price from Etherchain.org for a given priority (tx conf speed).
 
