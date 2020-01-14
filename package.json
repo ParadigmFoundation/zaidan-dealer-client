@@ -21,7 +21,7 @@
     "docs:build": "yarn docs && vuepress build docs"
   },
   "config": {
-    "image": "gcr.io/zaidan-eth-net/0x-snapshot:v3
+    "image": "gcr.io/zaidan-eth-net/0x-snapshot:v3"
   },
   "dependencies": {
     "@0x/abi-gen-wrappers": "^5.4.0-beta.3",
