@@ -66,9 +66,6 @@ export class DealerClient {
   /** Set to 'true' after a successful .init(), must be called before use. */
   public initialized: boolean;
 
-  /** Set to 'true' if browser environment is detected. */
-  public isBrowser: boolean;
-
   /** Default gas price to use for allowance transactions (in wei). */
   public GAS_PRICE: BigNumber;
 
@@ -88,14 +85,15 @@ export class DealerClient {
    * setting of attempting to load a web3 provider through the browser.
    *
    * @param dealerUri the base RPC API path for the dealer server
+   * @param provider an ethereum provider
    * @param options optional configuration to allow non standard usages of the class
    */
-  constructor(dealerUri: string, options: DealerOptions = {}) {
-    const { takerAddress, providerUrl, txPriority = "fast", provider } = options;
+  constructor(dealerUri: string, provider: Provider, options: DealerOptions = {}) {
+    const { takerAddress, txPriority = "fast" } = options;
     this.initialized = false;
 
-    this.web3Wrapper = null;
-    this.provider = provider || null;
+    this.provider = provider;
+    this.web3Wrapper = new Web3Wrapper(this.provider);
 
     this.networkId = null;
     this.coinbase = takerAddress || null;
@@ -116,18 +114,6 @@ export class DealerClient {
    * @returns A promise that resolves when initialization is complete.
    */
   public async init(): Promise<void> {
-    if (!this.provider) {
-      if (this.web3Url) {
-        this.isBrowser = false;
-        this.provider = this.web3.currentProvider;
-      } else {
-        await this._connectMetamask();
-        this.isBrowser = true;
-        this.provider = new MetamaskSubprovider((window as any).ethereum);
-      }
-    }
-
-    this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
     this.networkId = await this.web3Wrapper.getNetworkIdAsync();
     this.contractWrappers = new ContractWrappers(
       this.provider,
@@ -490,20 +476,6 @@ export class DealerClient {
    */
   public supportedTickers(): string[] {
     return Object.keys(this.tokens);
-  }
-
-  private async _connectMetamask(): Promise<void> {
-    assert(window, "not in browser environment");
-    const { web3, ethereum } = (window as any);
-    assert(web3 || ethereum, "unsupported browser (must be a web3 browser)");
-
-    if (ethereum) {
-      try {
-        await ethereum.enable();
-      } catch (error) {
-        throw new Error("user denied site access");
-      }
-    }
   }
 
   private async _callAny(url: string, method: "GET" | "POST", data?: any): Promise<any> {
