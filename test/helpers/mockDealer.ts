@@ -44,11 +44,11 @@ class MockDealer {
 
     public async init(url: string): Promise<void> {
         this.web3 = new Web3(url);
-        this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
+        this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider as any);
 
         const networkId = await this.web3.eth.net.getId();
 
-        this.zeroExContracts = new ContractWrappers(this.web3.currentProvider, { chainId: networkId });
+        this.zeroExContracts = new ContractWrappers(this.web3.currentProvider as any, { chainId: networkId });
         this.EXCHANGE_ADDRESS = this.zeroExContracts.exchange.address;
         this.initialized = true;
     }
@@ -100,12 +100,12 @@ class MockDealer {
             exchangeAddress: this.EXCHANGE_ADDRESS,
             takerAddress: this.NULL_ADDRESS,
             feeRecipientAddress: this.NULL_ADDRESS,
-            makerFeeAssetData: "0x",
-            takerFeeAssetData: "0x",
+            makerFeeAssetData: "0x000000000000000000000000000000000000000000000000000000000000000000000000",
+            takerFeeAssetData: "0x000000000000000000000000000000000000000000000000000000000000000000000000",
         };
 
         return signatureUtils.ecSignOrderAsync(
-            this.web3.currentProvider,
+            this.web3.currentProvider as any,
             zeroExOrder,
             this.serverAddress,
         );
@@ -123,7 +123,8 @@ class MockDealer {
             {
                 from: this.serverAddress,
                 gas: "4400000",
-                value: "1000000",
+                value: "100000000",
+                gasPrice: new BigNumber(gasPrice).toString(),
             },
         );
         return hash;
