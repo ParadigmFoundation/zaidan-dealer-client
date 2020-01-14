@@ -81,7 +81,7 @@ describe("Zaidan client unit tests", function (): void {
         clientAddress = accounts[parseInt(CLIENT_ACCOUNT_INDEX)];
         dealerAddress = accounts[parseInt(DEALER_ACCOUNT_INDEX)];
 
-        client = new DealerClient(DEALER_URL, { providerUrl: WEB3_URL, takerAddress: clientAddress });
+        client = new DealerClient(DEALER_URL, web3.currentProvider, { takerAddress: clientAddress });
         await client.init();
     });
 

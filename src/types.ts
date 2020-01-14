@@ -7,9 +7,6 @@ export interface DealerOptions {
     /** Address to use to sign and fill orders. */
     takerAddress?: string;
 
-    /** Ethereum JSONRPC provider url (server-side only) */
-    providerUrl?: string;
-
     /** Optional gas price selector (fast, safeLow, etc.) */
     txPriority?: GasPriority;
 }
