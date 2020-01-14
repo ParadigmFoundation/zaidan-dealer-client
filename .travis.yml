@@ -6,7 +6,7 @@ services:
   - docker
 before_install:
   # start ganache snapshot
-  - docker run -d --rm -p 8545:8545 gcr.io/zaidan-eth-net/0x-snapshot:latest
+  - docker run -d --rm -p 8545:8545 gcr.io/zaidan-eth-net/0x-snapshot:v3
 install:
   - yarn
   - yarn build
