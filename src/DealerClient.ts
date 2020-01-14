@@ -32,9 +32,6 @@ export class DealerClient {
   /** Dealer server RPC server URL. */
   private readonly dealerUrl: URL;
 
-  /** Stores the Ethereum JSONRPC provider URL for server-side usage. */
-  private readonly web3Url: URL;
-
   /** Base API path for the dealer server. */
   private readonly apiBase: string;
 
@@ -51,10 +48,7 @@ export class DealerClient {
    */
   public tokens: { [ticker: string]: string };
 
-  /** Main Web3 instance for interacting with Ethereum. */
-  public web3: Web3;
-
-  /** Provides additional convenience methods for interacting with web3. */
+  /** Provides convenience methods for interacting with Ethereum. */
   public web3Wrapper: Web3Wrapper;
 
   /** Provider instance used to interact with Ethereum. */
@@ -100,7 +94,6 @@ export class DealerClient {
     const { takerAddress, providerUrl, txPriority = "fast", provider } = options;
     this.initialized = false;
 
-    this.web3 = null;
     this.web3Wrapper = null;
     this.provider = provider || null;
 
@@ -112,10 +105,6 @@ export class DealerClient {
 
     this.dealerUrl = new URL(dealerUri);
     this.apiBase = `${this.dealerUrl.href}api/v${DealerClient.COMPATIBLE_VERSION}`;
-
-    if (providerUrl) {
-      this.web3Url = new URL(providerUrl);
-    }
   }
 
   /**
@@ -130,21 +119,18 @@ export class DealerClient {
     if (!this.provider) {
       if (this.web3Url) {
         this.isBrowser = false;
-        this.web3 = new Web3(this.web3Url.href);
         this.provider = this.web3.currentProvider;
       } else {
         await this._connectMetamask();
         this.isBrowser = true;
         this.provider = new MetamaskSubprovider((window as any).ethereum);
       }
-    } else {
-      this.web3 = new Web3(this.provider as any);
     }
 
     this.web3Wrapper = new Web3Wrapper(this.web3.currentProvider);
     this.networkId = await this.web3Wrapper.getNetworkIdAsync();
     this.contractWrappers = new ContractWrappers(
-      this.web3.currentProvider,
+      this.provider,
       {
         networkId: this.networkId,
       },
@@ -514,14 +500,9 @@ export class DealerClient {
     if (ethereum) {
       try {
         await ethereum.enable();
-        this.web3 = new Web3(ethereum);
       } catch (error) {
         throw new Error("user denied site access");
       }
-      Object.defineProperty(global, "web3", this.web3);
-    } else {
-      this.web3 = new Web3(web3.currentProvider);
-      Object.defineProperty(window, "web3", this.web3);
     }
   }
 
