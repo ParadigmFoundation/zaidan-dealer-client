@@ -7,7 +7,7 @@ import { ERC20Token } from "@habsyr/erc20-token";
 import assert from "assert";
 import axios from "axios";
 import { Provider, SupportedProvider, TransactionReceiptWithDecodedLogs } from "ethereum-types";
-import Web3 from "web3";
+import { fromWei, toWei } from "web3-utils";
 
 import {
   convertZeroExTransactionToDealerFill,
@@ -151,7 +151,7 @@ export class DealerClient {
     );
 
     // set coinbase if not already set as configuration option
-    this.coinbase = this.coinbase || await this.web3.eth.getCoinbase();
+    this.coinbase = this.coinbase || await this.web3Wrapper.getAvailableAddressesAsync().then(addresses => addresses[0]);
 
     this.erc20Token = new ERC20Token(this.contractWrappers.getProvider());
     this.GAS_PRICE = await getGasPrice(this.txPriority);
@@ -447,7 +447,7 @@ export class DealerClient {
    */
   public fromWei(weiAmount: string): string {
     assert(typeof weiAmount === "string", "pass amounts as strings to avoid precision errors");
-    return this.web3.utils.fromWei(weiAmount);
+    return fromWei(weiAmount);
   }
 
   /**
@@ -468,7 +468,7 @@ export class DealerClient {
    */
   public toWei(etherAmount: string): string {
     assert(typeof etherAmount === "string", "pass amounts as strings to avoid precision errors");
-    return this.web3.utils.toWei(etherAmount);
+    return toWei(etherAmount);
   }
 
   /**
