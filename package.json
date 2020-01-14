@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "build": "tsc",
-    "test": "yarn start:snapshot && sleep 2 && yarn test:ci && yarn stop:snapshot",
+    "test": "yarn start:snapshot && sleep 2 && yarn test:ci; yarn stop:snapshot",
     "test:ci": "ts-mocha --exit test/*_test.ts",
     "clean": "rm -rf node_modules dist",
     "compile:assets": "yarn build && webpack",
