@@ -17,6 +17,7 @@
         ]
     },
     "include": [
+        "src/dealer_client.ts",
         "src/DealerClient.ts",
         "src/tokens.json"
     ],

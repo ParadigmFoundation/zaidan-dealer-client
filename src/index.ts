@@ -1,5 +1,5 @@
 export { ERC20Token } from "@habsyr/erc20-token";
-export { DealerClient } from "./DealerClient";
+export { DealerClient } from "./dealer_client";
 export * from "./types";
 export * from "./utils";
-export { SignedOrder } from "@0x/types";
+export { SignedOrder, ZeroExTransaction, SignedZeroExTransaction } from "@0x/types";
